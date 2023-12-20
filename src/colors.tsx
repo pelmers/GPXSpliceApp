@@ -6,4 +6,5 @@ export const colors = {
   accent: "#523c8f",
   light: "#ff89a0",
   dark: "#1e2c6d",
+  strava: "#fc4c02",
 };
