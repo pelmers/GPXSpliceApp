@@ -10,8 +10,10 @@ class RedirectHandler(BaseHTTPRequestHandler):
         # Parse the URL and parameters
         parsed_url = urlparse(self.path)
         params = parse_qs(parsed_url.query)
-        # Construct the new URL
+        # Construct the new URL with the app scheme (see app.json)
         new_url = f"gpxsplice://{parsed_url.path}"
+        # NOTE: during development use the "exp" scheme for the Expo Go app
+        # new_url = f"exp://{parsed_url.path}"
         if params:
             new_url += '?' + '&'.join([f"{k}={v[0]}" for k, v in params.items()])
         # Send a 302 redirect response
@@ -25,4 +27,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     server = HTTPServer(('localhost', args.port), RedirectHandler)
+    print(f"Listening on port {args.port}...")
     server.serve_forever()

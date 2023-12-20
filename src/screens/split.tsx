@@ -47,10 +47,10 @@ export function SplitScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
+      // TODO: move this const to another file
       clientId: "118471",
       scopes: ["activity:read_all"],
-      // TODO: actually implement this redirect URI on the server
-      redirectUri:"https://gpxsplice_redirect.pelmers.com",
+      redirectUri:"https://gpxspliceredirect.pelmers.com",
     },
     {
       authorizationEndpoint: "https://www.strava.com/oauth/mobile/authorize",
@@ -61,6 +61,7 @@ export function SplitScreen({ navigation }: Props) {
     if (response?.type === "success") {
       const { code } = response.params;
       console.log("Strava auth success", code);
+      // TODO: navigate to next screen (list of activities)
     }
   }, [response]);
 
