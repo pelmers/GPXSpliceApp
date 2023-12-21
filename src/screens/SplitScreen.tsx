@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Pressable, Alert, Text } from "react-native";
 
-import { ResizeMode, Video } from "expo-av";
 import * as DocumentPicker from "expo-document-picker";
 import * as AuthSession from "expo-auth-session";
 
 import { colors } from "../colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
-import { BlurView } from "expo-blur";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Split">;
 
@@ -47,21 +45,25 @@ export function SplitScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
-      // TODO: move this const to another file
+      // TODO: move this id const to another file
       clientId: "118471",
       scopes: ["activity:read_all"],
-      redirectUri:"https://gpxspliceredirect.pelmers.com",
+      redirectUri: "https://gpxspliceredirect.pelmers.com",
     },
     {
-      authorizationEndpoint: "https://www.strava.com/oauth/mobile/authorize",
+      authorizationEndpoint: stravaDiscovery.authorizationEndpoint,
     },
   );
 
   React.useEffect(() => {
     if (response?.type === "success") {
       const { code } = response.params;
-      console.log("Strava auth success", code);
-      // TODO: navigate to next screen (list of activities)
+      console.log("Strava code success", code);
+      // TODO: read access token from response
+      navigation.navigate("StravaActivities", {
+        accessToken: code,
+        mode: "split",
+      });
     }
   }, [response]);
 
@@ -87,7 +89,6 @@ export function SplitScreen({ navigation }: Props) {
         disabled={!request}
         onPress={async () => {
           try {
-            // TODO: connect to Strava, show list of recent activities on a new screen
             await promptAsync();
             setError(null);
           } catch (e) {

@@ -5,11 +5,12 @@ import { ResizeMode, Video } from "expo-av";
 import * as Font from "expo-font";
 import { registerRootComponent } from "expo";
 
-import { HomeScreen } from "./screens/home";
+import { HomeScreen } from "./screens/HomeScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { RootStackParamList } from "./routes";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { SplitScreen } from "./screens/split";
+import { SplitScreen } from "./screens/SplitScreen";
+import { StravaActivitiesScreen } from "./screens/StravaActivitiesScreen";
 
 // Title page: autoplays banner.mp4 in top half of page, shows 2 buttons below that, centered
 // button 1: split GPS file
@@ -48,6 +49,10 @@ export default function App() {
         />
         {/* TODO implement other screens */}
         <Stack.Screen name="Split" component={SplitScreen} />
+        <Stack.Screen
+          name="StravaActivities"
+          component={StravaActivitiesScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
