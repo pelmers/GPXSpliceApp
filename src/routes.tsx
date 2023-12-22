@@ -1,5 +1,11 @@
+import { StravaAthlete } from "./types/strava";
+
 export type RootStackParamList = {
   Home: undefined;
   Split: undefined;
-  StravaActivities: { accessToken: string; mode: "split" | "combine" };
+  StravaActivities: {
+    accessToken: string;
+    mode: "split" | "combine";
+    athlete: StravaAthlete;
+  };
 };

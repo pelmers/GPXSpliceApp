@@ -35,12 +35,6 @@ async function getGpxFileUri(): Promise<string> {
   }
 }
 
-const stravaDiscovery = {
-  authorizationEndpoint: "https://www.strava.com/oauth/mobile/authorize",
-  tokenEndpoint: "https://www.strava.com/oauth/token",
-  revocationEndpoint: "https://www.strava.com/oauth/deauthorize",
-};
-
 export function SplitScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
@@ -51,7 +45,7 @@ export function SplitScreen({ navigation }: Props) {
       redirectUri: "https://gpxspliceredirect.pelmers.com",
     },
     {
-      authorizationEndpoint: stravaDiscovery.authorizationEndpoint,
+      authorizationEndpoint: "https://www.strava.com/oauth/mobile/authorize",
     },
   );
 
@@ -59,10 +53,15 @@ export function SplitScreen({ navigation }: Props) {
     if (response?.type === "success") {
       const { code } = response.params;
       console.log("Strava code success", code);
-      // TODO: read access token from response
+      // TODO: read access token from response by parsing 'payload' param
+      const payload = JSON.parse(response.params.payload);
+      console.log("Strava payload", payload);
+      const accessToken = payload.access_token;
+      // TODO: do something also with the rest of the payload (e.g. athlete info)
       navigation.navigate("StravaActivities", {
-        accessToken: code,
+        accessToken,
         mode: "split",
+        athlete: payload.athlete,
       });
     }
   }, [response]);
