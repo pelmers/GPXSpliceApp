@@ -17,6 +17,7 @@ import { colors } from "../colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import { StravaActivity, StravaAthlete } from "../types/strava";
+import { StravaActivityRow } from "../components/StravaActivityRow";
 
 type Props = NativeStackScreenProps<RootStackParamList, "StravaActivities">;
 
@@ -41,14 +42,6 @@ async function fetchStravaActivities(
   return json;
 }
 
-function displayActivity(activity: StravaActivity, key: number) {
-  return (
-    <View key={key}>
-      <Text>{activity.name}</Text>
-      <Text>TODO: show other fields</Text>
-    </View>
-  );
-}
 
 function displayAthlete(athlete: StravaAthlete) {
   // Render a banner that shows information about the logged in athlete
@@ -92,26 +85,37 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
       });
   }, [accessToken]);
 
-  return  (
-  <View style={{flex: 1, flexDirection: 'column'}}>
-  {displayAthlete(athlete)}
-      <Text style={styles.instructionText}>Select an activity to split</Text>
-      <ScrollView style={{flex: 1}}>
-        {activities.map(displayActivity)}
+  return (
+    <View style={styles.container}>
+      <View style={{ flexBasis: 75 }}>{displayAthlete(athlete)}</View>
+      <View style={{ flexBasis: 25 }}>
+        <Text style={styles.instructionText}>Select an activity to split</Text>
+      </View>
+      <ScrollView style={{ flexGrow: 1 }}>
+        {activities.map(
+          (activity, index) => <StravaActivityRow key={index}
+          activity={activity}
+          onPress={(activity) => {console.log(activity);}}
+          />)}
         {loading && <ActivityIndicator size="large" />}
         {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
-  </View>
+    </View>
   );
 }
 
+// TODO: pretty colors and styles
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    backgroundColor: "#fff",
+  },
   athleteInfoContainer: {
     flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    marginBottom: 10,
   },
   athleteNameText: {
     fontSize: 22,
@@ -122,8 +126,10 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   instructionText: {
-    fontSize: 16,
-    marginBottom: 10,
+    fontSize: 15,
+    textAlign: "center",
+    fontStyle: "italic",
+    color: colors.accent,
   },
   errorText: {
     color: "red",

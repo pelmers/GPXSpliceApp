@@ -1,20 +1,69 @@
 // incomplete, refer to https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities
 export type StravaActivity = { id: number } & Partial<{
-  name: string;
-  distance: number; // in meters
-  moving_time: number;
-  elapsed_time: number;
-  total_elevation_gain: number; // in meters
-  type: string;
-  sport_type: string;
-  kudos_count: number;
+  achievement_count: number;
+  athlete: {
+    id: number;
+    resource_state: number;
+  };
+  athlete_count: number;
+  average_cadence: number;
+  average_heartrate: number;
+  average_speed: number;
+  average_temp: number;
+  average_watts: number;
   comment_count: number;
-  private: boolean;
-  average_speed: number; // in meters per second
-  max_speed: number;
-  location_city: string;
-  location_state: string;
+  commute: boolean;
+  device_watts: boolean;
+  display_hide_heartrate_option: boolean;
+  distance: number;
+  elapsed_time: number;
+  elev_high: number;
+  elev_low: number;
+  end_latlng: [number, number];
+  external_id: string;
+  flagged: boolean;
+  from_accepted_tag: boolean;
+  gear_id: string;
+  has_heartrate: boolean;
+  has_kudoed: boolean;
+  heartrate_opt_out: boolean;
+  id: number;
+  kilojoules: number;
+  kudos_count: number;
+  location_city: null | string;
   location_country: string;
+  location_state: null | string;
+  manual: boolean;
+  map: {
+    id: string;
+    resource_state: number;
+    summary_polyline: string;
+  };
+  max_heartrate: number;
+  max_speed: number;
+  max_watts: number;
+  moving_time: number;
+  name: string;
+  photo_count: number;
+  pr_count: number;
+  private: boolean;
+  resource_state: number;
+  sport_type: string;
+  start_date: string;
+  start_date_local: string;
+  start_latlng: [number, number];
+  suffer_score: number;
+  timezone: string;
+  total_elevation_gain: number;
+  total_photo_count: number;
+  trainer: boolean;
+  type: string;
+  upload_id: number;
+  upload_id_str: string;
+  utc_offset: number;
+  visibility: string;
+  weighted_average_watts: number;
+  workout_type: string;
 }>;
 
 export type StravaAthlete = { id: number } & Partial<{
