@@ -37,64 +37,61 @@ function formatDuration(duration: number) {
 }
 
 type Props = {
-    activity: StravaActivity;
-    onPress: (activity: StravaActivity) => void;
-    };
+  activity: StravaActivity;
+  onPress: (activity: StravaActivity) => void;
+};
 
 export function StravaActivityRow(props: Props) {
-    const { activity } = props;
-    const typeEmoji = getActivityEmoji(activity);
-    const hasGps = activity.map != null && activity.map.summary_polyline != null;
-    const distanceKm = activity.distance
-      ? (activity.distance / 1000).toFixed(2)
-      : null;
-    const location = activity.location_city ? activity.location_city : null;
-    const duration = activity.moving_time
-      ? formatDuration(activity.moving_time)
-      : null;
-    const publicText = activity.private ? "🔒" : "🌎";
-    return (
-      <View>
-        <Pressable
-          style={styles.activityInfoContainer}
-          onPress={() => props.onPress(activity) }
-          disabled={!hasGps}
-        >
-          <View>
-            <Text style={{ fontSize: 30 }}>{typeEmoji}</Text>
+  const { activity } = props;
+  const typeEmoji = getActivityEmoji(activity);
+  const hasGps = activity.map != null && activity.map.summary_polyline != null;
+  const distanceKm = activity.distance
+    ? (activity.distance / 1000).toFixed(2)
+    : null;
+  const location = activity.location_city ? activity.location_city : null;
+  const duration = activity.moving_time
+    ? formatDuration(activity.moving_time)
+    : null;
+  const publicText = activity.private ? "🔒" : "🌎";
+  return (
+    <View>
+      <Pressable
+        style={styles.activityInfoContainer}
+        onPress={() => props.onPress(activity)}
+        disabled={!hasGps}
+      >
+        <View>
+          <Text style={{ fontSize: 30 }}>{typeEmoji}</Text>
+        </View>
+        <View>
+          <Text style={styles.activityInfoNameText}>{activity.name}</Text>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.activityInfoRowExtraText}>{publicText}</Text>
+            {duration && (
+              <Text style={styles.activityInfoRowExtraText}>{duration}</Text>
+            )}
+            {distanceKm && (
+              <Text style={styles.activityInfoRowExtraText}>
+                {distanceKm}km
+              </Text>
+            )}
+            {location && (
+              <Text style={styles.activityInfoRowExtraText}>{location}</Text>
+            )}
           </View>
-          <View>
-            <Text style={styles.activityInfoNameText}>
-              {activity.name}
-            </Text>
-            {/* other fields shown in a single row, with padding between them */}
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.activityInfoRowExtraText}>{publicText}</Text>
-              {duration && (
-                <Text style={styles.activityInfoRowExtraText}>{duration}</Text>
-              )}
-              {distanceKm && (
-                <Text style={styles.activityInfoRowExtraText}>
-                  {distanceKm}km
-                </Text>
-              )}
-              {location && (
-                <Text style={styles.activityInfoRowExtraText}>{location}</Text>
-              )}
-            </View>
-          </View>
-        </Pressable>
-        <View
-          style={{
-            borderBottomColor: colors.light,
-            borderBottomWidth: 1,
-            opacity: 0.2,
-            marginHorizontal: 100,
-          }}
-        ></View>
-      </View>
-    );
-  }
+        </View>
+      </Pressable>
+      <View
+        style={{
+          borderBottomColor: colors.light,
+          borderBottomWidth: 1,
+          opacity: 0.2,
+          marginHorizontal: 100,
+        }}
+      ></View>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   activityInfoContainer: {

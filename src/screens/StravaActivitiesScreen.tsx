@@ -11,37 +11,21 @@ import {
 } from "react-native";
 
 import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
 import * as AuthSession from "expo-auth-session";
 
 import { colors } from "../colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
-import { StravaActivity, StravaAthlete } from "../types/strava";
+import {
+  StravaActivity,
+  StravaAthlete,
+  fetchStravaActivities,
+  fetchStravaActivityGpx,
+} from "../types/strava";
 import { StravaActivityRow } from "../components/StravaActivityRow";
 
 type Props = NativeStackScreenProps<RootStackParamList, "StravaActivities">;
-
-async function fetchStravaActivities(
-  accessToken: string,
-  page: number = 1,
-): Promise<StravaActivity[]> {
-  const response = await fetch(
-    `https://www.strava.com/api/v3/athlete/activities?page=${page}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  );
-  const json = await response.json();
-  // if error in json, throw an error
-  if (json.errors != null) {
-    throw new Error(json.errors[0].message);
-  }
-  return json;
-}
-
 
 function displayAthlete(athlete: StravaAthlete) {
   // Render a banner that shows information about the logged in athlete
@@ -85,6 +69,8 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
       });
   }, [accessToken]);
 
+  // TODO: paginate when scrolling to bottom of list
+  // TODO: implement drag up to refresh
   return (
     <View style={styles.container}>
       <View style={{ flexBasis: 75 }}>{displayAthlete(athlete)}</View>
@@ -92,11 +78,33 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
         <Text style={styles.instructionText}>Select an activity to split</Text>
       </View>
       <ScrollView style={{ flexGrow: 1 }}>
-        {activities.map(
-          (activity, index) => <StravaActivityRow key={index}
-          activity={activity}
-          onPress={(activity) => {console.log(activity);}}
-          />)}
+        {activities.map((activity, index) => (
+          <StravaActivityRow
+            key={index}
+            activity={activity}
+            onPress={async (activity) => {
+              console.log(activity);
+              setLoading(true);
+              try {
+                const gpxContents = await fetchStravaActivityGpx(
+                  activity,
+                  accessToken,
+                );
+                if (FileSystem.cacheDirectory == null) {
+                  throw new Error("FileSystem.cacheDirectory is null");
+                }
+                const fileUri = `{FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
+                await FileSystem.writeAsStringAsync(fileUri, gpxContents);
+                // navigate to next screen
+                navigation.navigate("GpxSplitMap", { gpxFileUri: fileUri });
+              } catch (e) {
+                setError((e as Error).message);
+              } finally {
+                setLoading(false);
+              }
+            }}
+          />
+        ))}
         {loading && <ActivityIndicator size="large" />}
         {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>

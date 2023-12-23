@@ -88,3 +88,72 @@ export type StravaAthlete = { id: number } & Partial<{
   username: string;
   weight: number;
 }>;
+
+export type StravaStream =
+  | { type: 'temp'; data: number[] }
+  | { type: 'watts'; data: number[] }
+  | { type: 'latlng'; data: [number, number][] }
+  | { type: 'cadence'; data: number[] }
+  | { type: 'distance'; data: number[] }
+  | { type: 'heartrate'; data: number[] }
+  | { type: 'altitude'; data: number[] }
+  | { type: 'time'; data: number[] }
+  & {
+    original_size: number;
+    resolution: string;
+    series_type: string;
+  };
+
+export async function fetchStravaActivities(
+  accessToken: string,
+  page: number = 1,
+): Promise<StravaActivity[]> {
+  const response = await fetch(
+    `https://www.strava.com/api/v3/athlete/activities?page=${page}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  const json = await response.json();
+  // if error in json, throw an error
+  if (json.errors != null) {
+    throw new Error(json.errors[0].message);
+  }
+  return json;
+}
+
+// Attempt to download a activity from strava, save it to a cache and return the uri
+// Strava doesn't give us a direct gpx file unless it was uploaded from a device in that format
+// Instead we can download all the streams and build our own gpx file
+// This function returns the gpx contents as a string.
+export async function fetchStravaActivityGpx(
+  activity: StravaActivity,
+  accessToken: string,
+): Promise<string> {
+    const activityId = activity.id;
+    // Ask for all streams
+    const response = await fetch(
+        `https://www.strava.com/api/v3/activities/${activityId}/streams/time,distance,latlng,altitude,heartrate,cadence,watts,temp`,
+        {
+            method: "GET",
+            headers: {
+            Authorization: `Bearer ${accessToken}`,
+            },
+        },
+    );
+    // just log the result for now
+    const streams = (await response.json()) as StravaStream[];
+    // to make it readable, limit the 'data' field to 2 items for each stream
+    streams.forEach((stream: any) => {
+        stream.data = stream.data.slice(0, 2);
+    });
+    console.log('streams', streams);
+    return stravaStreamsToGpx(activity, streams);
+}
+
+function stravaStreamsToGpx(activity: StravaActivity, streams: StravaStream[]): string {
+  return "not implemented";
+}

@@ -46,7 +46,7 @@ export function HomeScreen({ navigation }: Props) {
       <View style={styles.buttonBackground}>
         <Pressable
           onPress={() => {
-            navigation.navigate("Split");
+            navigation.navigate("SplitEntry");
           }}
           style={styles.button}
         >
@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 4,
     elevation: 3,
+    width: 200,
     backgroundColor: colors.accent,
   },
   buttonText: {

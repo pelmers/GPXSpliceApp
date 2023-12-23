@@ -8,7 +8,7 @@ import { colors } from "../colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Split">;
+type Props = NativeStackScreenProps<RootStackParamList, "SplitEntry">;
 
 async function getGpxFileUri(): Promise<string> {
   const result = await DocumentPicker.getDocumentAsync({
@@ -26,7 +26,7 @@ async function getGpxFileUri(): Promise<string> {
       console.log("File is a GPX file");
       return resultFile.uri;
     } else {
-      throw new Error("Selected file extension is not .gpx!");
+      throw new Error("Selected file extension is not .gpx");
     }
   } else {
     // The user cancelled the file picker
@@ -35,13 +35,14 @@ async function getGpxFileUri(): Promise<string> {
   }
 }
 
-export function SplitScreen({ navigation }: Props) {
+export function SplitEntryScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       // TODO: move this id const to another file
       clientId: "118471",
-      scopes: ["activity:read_all"],
+      // Not sure why but scopes need to be a single string, otherwise strava gives a 400 error
+      scopes: ["activity:read_all,activity:write"],
       redirectUri: "https://gpxspliceredirect.pelmers.com",
     },
     {
@@ -51,13 +52,14 @@ export function SplitScreen({ navigation }: Props) {
 
   React.useEffect(() => {
     if (response?.type === "success") {
-      const { code } = response.params;
-      console.log("Strava code success", code);
-      // TODO: read access token from response by parsing 'payload' param
+      // read access token from response by parsing 'payload' param which the redirect server gives us
       const payload = JSON.parse(response.params.payload);
       console.log("Strava payload", payload);
       const accessToken = payload.access_token;
-      // TODO: do something also with the rest of the payload (e.g. athlete info)
+      const {scope} = response.params;
+      if (!scope.includes('activity:write')) {
+        Alert.alert('Warning', 'Without write permission, I cannot help you upload activities after splitting!');
+      }
       navigation.navigate("StravaActivities", {
         accessToken,
         mode: "split",
@@ -75,7 +77,7 @@ export function SplitScreen({ navigation }: Props) {
           try {
             const fileUri = await getGpxFileUri();
             setError(null);
-            // TODO: navigate to next screen (map with route by reading GPX file)
+            navigation.navigate("GpxSplitMap", { gpxFileUri: fileUri });
           } catch (e) {
             setError((e as Error).message);
           }
