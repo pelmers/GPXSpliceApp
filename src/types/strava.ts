@@ -1,3 +1,5 @@
+import { GpxPoint, parseGpxFile, pointsToGpx } from "../utils/gpx";
+
 // incomplete, refer to https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities
 export type StravaActivity = { id: number } & Partial<{
   achievement_count: number;
@@ -90,19 +92,18 @@ export type StravaAthlete = { id: number } & Partial<{
 }>;
 
 export type StravaStream =
-  | { type: 'temp'; data: number[] }
-  | { type: 'watts'; data: number[] }
-  | { type: 'latlng'; data: [number, number][] }
-  | { type: 'cadence'; data: number[] }
-  | { type: 'distance'; data: number[] }
-  | { type: 'heartrate'; data: number[] }
-  | { type: 'altitude'; data: number[] }
-  | { type: 'time'; data: number[] }
-  & {
-    original_size: number;
-    resolution: string;
-    series_type: string;
-  };
+  | { type: "temp"; data: number[] }
+  | { type: "watts"; data: number[] }
+  | { type: "latlng"; data: [number, number][] }
+  | { type: "cadence"; data: number[] }
+  | { type: "distance"; data: number[] }
+  | { type: "heartrate"; data: number[] }
+  | { type: "altitude"; data: number[] }
+  | ({ type: "time"; data: number[] } & {
+      original_size: number;
+      resolution: string;
+      series_type: string;
+    });
 
 export async function fetchStravaActivities(
   accessToken: string,
@@ -133,27 +134,60 @@ export async function fetchStravaActivityGpx(
   activity: StravaActivity,
   accessToken: string,
 ): Promise<string> {
-    const activityId = activity.id;
-    // Ask for all streams
-    const response = await fetch(
-        `https://www.strava.com/api/v3/activities/${activityId}/streams/time,distance,latlng,altitude,heartrate,cadence,watts,temp`,
-        {
-            method: "GET",
-            headers: {
-            Authorization: `Bearer ${accessToken}`,
-            },
-        },
-    );
-    // just log the result for now
-    const streams = (await response.json()) as StravaStream[];
-    // to make it readable, limit the 'data' field to 2 items for each stream
-    streams.forEach((stream: any) => {
-        stream.data = stream.data.slice(0, 2);
-    });
-    console.log('streams', streams);
-    return stravaStreamsToGpx(activity, streams);
+  const activityId = activity.id;
+  // Ask for all streams
+  const response = await fetch(
+    `https://www.strava.com/api/v3/activities/${activityId}/streams/time,distance,latlng,altitude,heartrate,cadence,watts,temp`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  // just log the result for now
+  const streams = (await response.json()) as StravaStream[];
+  // to make it readable, limit the 'data' field to 2 items for each stream
+  // streams.forEach((stream: any) => {
+  //   stream.data = stream.data.slice(0, 2);
+  // });
+  console.log("streams", streams);
+  return stravaStreamsToGpx(activity, streams);
 }
 
-function stravaStreamsToGpx(activity: StravaActivity, streams: StravaStream[]): string {
-  return "not implemented";
+function stravaStreamsToGpx(
+  activity: StravaActivity,
+  streams: StravaStream[],
+): string {
+  const name = activity.name;
+  const type = activity.type;
+  // Join all the stream types into point objects by zipping them together
+  const n_points = streams.find((s) => s.type === "latlng")?.data.length;
+  if (n_points == null) {
+    throw new Error("No latlng stream for activity");
+  }
+  // Keep all the streams with data of the same length
+  const points: GpxPoint[] = [];
+  for (let i = 0; i < n_points; i++) {
+    const point: GpxPoint = {};
+    streams.forEach((s) => {
+      // Funny branching here to make the type checker happy
+      if (s.type === "latlng") {
+        point[s.type] = s.data[i];
+      } else {
+        point[s.type] = s.data[i];
+      }
+    });
+    points.push(point);
+  }
+
+  const result = pointsToGpx(
+    points,
+    name ?? "Unnamed Activity",
+    type ?? "UnknownSport",
+  );
+  // Check result by also parsing it
+  const parsed = parseGpxFile(result);
+  console.log("parsed???", parsed);
+  return result;
 }

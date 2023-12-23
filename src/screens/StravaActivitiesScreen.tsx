@@ -5,6 +5,7 @@ import {
   Pressable,
   Alert,
   Image,
+  Modal,
   Text,
   ActivityIndicator,
   ScrollView,
@@ -14,7 +15,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import * as AuthSession from "expo-auth-session";
 
-import { colors } from "../colors";
+import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import {
@@ -24,6 +25,7 @@ import {
   fetchStravaActivityGpx,
 } from "../types/strava";
 import { StravaActivityRow } from "../components/StravaActivityRow";
+import { LoadingModal } from "../components/LoadingModal";
 
 type Props = NativeStackScreenProps<RootStackParamList, "StravaActivities">;
 
@@ -51,21 +53,23 @@ function displayAthlete(athlete: StravaAthlete) {
 
 export function StravaActivitiesScreen({ navigation, route }: Props) {
   const { accessToken, mode, athlete } = route.params;
-  const [loading, setLoading] = useState(false);
+  const [loadingInline, setLoadingInline] = useState(false);
+  const [loadingModal, setLoadingModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activities, setActivities] = useState<StravaActivity[]>([]);
 
   useEffect(() => {
-    setLoading(true);
+    setLoadingInline(true);
+    setError(null);
     fetchStravaActivities(accessToken)
       .then((activities) => {
         setActivities(activities);
-        setLoading(false);
+        setLoadingInline(false);
       })
       .catch((error) => {
         console.error(error);
         setError((error as Error).message);
-        setLoading(false);
+        setLoadingInline(false);
       });
   }, [accessToken]);
 
@@ -73,6 +77,7 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
   // TODO: implement drag up to refresh
   return (
     <View style={styles.container}>
+      <LoadingModal visible={loadingModal} />
       <View style={{ flexBasis: 75 }}>{displayAthlete(athlete)}</View>
       <View style={{ flexBasis: 25 }}>
         <Text style={styles.instructionText}>Select an activity to split</Text>
@@ -84,7 +89,8 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
             activity={activity}
             onPress={async (activity) => {
               console.log(activity);
-              setLoading(true);
+              setLoadingModal(true);
+              setError(null);
               try {
                 const gpxContents = await fetchStravaActivityGpx(
                   activity,
@@ -93,19 +99,20 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
                 if (FileSystem.cacheDirectory == null) {
                   throw new Error("FileSystem.cacheDirectory is null");
                 }
-                const fileUri = `{FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
+                const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
                 await FileSystem.writeAsStringAsync(fileUri, gpxContents);
                 // navigate to next screen
                 navigation.navigate("GpxSplitMap", { gpxFileUri: fileUri });
               } catch (e) {
                 setError((e as Error).message);
+                console.error(e);
               } finally {
-                setLoading(false);
+                setLoadingModal(false);
               }
             }}
           />
         ))}
-        {loading && <ActivityIndicator size="large" />}
+        {loadingInline && <ActivityIndicator size="large" />}
         {error && <Text style={styles.errorText}>{error}</Text>}
       </ScrollView>
     </View>

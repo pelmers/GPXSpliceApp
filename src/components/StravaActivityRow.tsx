@@ -1,8 +1,9 @@
 import { StyleSheet, View, Pressable, Text } from "react-native";
 
-import { colors } from "../colors";
+import { colors } from "../utils/colors";
 import { StravaActivity } from "../types/strava";
 
+// See full list at https://developers.strava.com/docs/reference/#api-models-SportType
 function getActivityEmoji(activity: StravaActivity) {
   switch (activity.type) {
     case "Run":
@@ -15,6 +16,22 @@ function getActivityEmoji(activity: StravaActivity) {
       return "🧘";
     case "Skateboard":
       return "🛹";
+    case "Walk":
+      return "🚶";
+    case "Hike":
+      return "🥾";
+    case "AlpineSki":
+      return "⛷";
+    case "BackcountrySki":
+      return "🎿";
+    case "Canoeing":
+      return "🛶";
+    case "Crossfit":
+      return "🏋️";
+    case "EBikeRide":
+      return "🚴";
+    case "Sail":
+      return "⛵";
     default:
       return "🤨";
   }

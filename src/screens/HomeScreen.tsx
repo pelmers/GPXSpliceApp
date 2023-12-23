@@ -10,7 +10,7 @@ import {
 
 import { ResizeMode, Video } from "expo-av";
 
-import { colors } from "../colors";
+import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import { BlurView } from "expo-blur";

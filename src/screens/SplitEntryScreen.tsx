@@ -4,7 +4,7 @@ import { StyleSheet, View, Pressable, Alert, Text } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as AuthSession from "expo-auth-session";
 
-import { colors } from "../colors";
+import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 
@@ -12,7 +12,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "SplitEntry">;
 
 async function getGpxFileUri(): Promise<string> {
   const result = await DocumentPicker.getDocumentAsync({
-    // type: "application/gpx+xml", // TODO: Only allow .gpx files, doesn't work!
+    // type: "application/gpx+xml", // TODO: want to only allow .gpx files, this doesn't work!
     copyToCacheDirectory: true, // Optional: Set to true if you want to copy the file to the app's cache directory
     multiple: false, // Only allow a single file
   });
@@ -56,9 +56,12 @@ export function SplitEntryScreen({ navigation }: Props) {
       const payload = JSON.parse(response.params.payload);
       console.log("Strava payload", payload);
       const accessToken = payload.access_token;
-      const {scope} = response.params;
-      if (!scope.includes('activity:write')) {
-        Alert.alert('Warning', 'Without write permission, I cannot help you upload activities after splitting!');
+      const { scope } = response.params;
+      if (!scope.includes("activity:write")) {
+        Alert.alert(
+          "Warning",
+          "Without write permission, I cannot help you upload activities after splitting!",
+        );
       }
       navigation.navigate("StravaActivities", {
         accessToken,
