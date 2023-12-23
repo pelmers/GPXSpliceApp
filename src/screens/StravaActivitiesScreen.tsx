@@ -88,7 +88,6 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
             key={index}
             activity={activity}
             onPress={async (activity) => {
-              console.log(activity);
               setLoadingModal(true);
               setError(null);
               try {

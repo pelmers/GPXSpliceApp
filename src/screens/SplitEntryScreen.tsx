@@ -20,17 +20,14 @@ async function getGpxFileUri(): Promise<string> {
   if (result.assets != null) {
     const resultFile = result.assets[0];
     // The file was successfully picked
-    console.log("Selected file: ", resultFile.uri, resultFile.mimeType);
     // if extension is not gpx, throw an error
     if (resultFile.uri.endsWith(".gpx")) {
-      console.log("File is a GPX file");
       return resultFile.uri;
     } else {
       throw new Error("Selected file extension is not .gpx");
     }
   } else {
     // The user cancelled the file picker
-    console.log("File picker was cancelled");
     throw new Error("File selection cancelled");
   }
 }
@@ -54,7 +51,6 @@ export function SplitEntryScreen({ navigation }: Props) {
     if (response?.type === "success") {
       // read access token from response by parsing 'payload' param which the redirect server gives us
       const payload = JSON.parse(response.params.payload);
-      console.log("Strava payload", payload);
       const accessToken = payload.access_token;
       const { scope } = response.params;
       if (!scope.includes("activity:write")) {

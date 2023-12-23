@@ -147,11 +147,6 @@ export async function fetchStravaActivityGpx(
   );
   // just log the result for now
   const streams = (await response.json()) as StravaStream[];
-  // to make it readable, limit the 'data' field to 2 items for each stream
-  // streams.forEach((stream: any) => {
-  //   stream.data = stream.data.slice(0, 2);
-  // });
-  console.log("streams", streams);
   return stravaStreamsToGpx(activity, streams);
 }
 
@@ -181,13 +176,9 @@ function stravaStreamsToGpx(
     points.push(point);
   }
 
-  const result = pointsToGpx(
+  return pointsToGpx(
     points,
     name ?? "Unnamed Activity",
     type ?? "UnknownSport",
   );
-  // Check result by also parsing it
-  const parsed = parseGpxFile(result);
-  console.log("parsed???", parsed);
-  return result;
 }
