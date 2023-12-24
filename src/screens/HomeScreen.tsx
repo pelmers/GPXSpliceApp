@@ -65,6 +65,7 @@ export function HomeScreen({ navigation }: Props) {
       </View>
     </View>
   );
+  // TODO: a settings button on the bottom
 }
 
 const styles = StyleSheet.create({
