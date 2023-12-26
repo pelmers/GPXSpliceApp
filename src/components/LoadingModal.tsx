@@ -1,30 +1,7 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  Alert,
-  Image,
-  Modal,
-  Text,
-  ActivityIndicator,
-  ScrollView,
-} from "react-native";
-
-import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
-import * as AuthSession from "expo-auth-session";
+import React from "react";
+import { StyleSheet, View, Modal, ActivityIndicator } from "react-native";
 
 import { colors } from "../utils/colors";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../routes";
-import {
-  StravaActivity,
-  StravaAthlete,
-  fetchStravaActivities,
-  fetchStravaActivityGpx,
-} from "../types/strava";
-import { StravaActivityRow } from "../components/StravaActivityRow";
 
 export function LoadingModal(props: { visible: boolean }) {
   return (

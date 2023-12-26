@@ -4,7 +4,6 @@
 
 import React, { useState, useMemo } from "react";
 import { StyleSheet, View, Text, Pressable } from "react-native";
-import { point as turfPoint, distance as turfDistance } from "@turf/turf";
 
 import { colors } from "../utils/colors";
 import { GpxPoint, calculateCumulativeDistance } from "../utils/gpx";

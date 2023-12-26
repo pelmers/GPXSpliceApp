@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View, Pressable, Alert, Text } from "react-native";
 
 import * as DocumentPicker from "expo-document-picker";

@@ -2,7 +2,6 @@
 import { LineChart } from "react-native-chart-kit";
 import React from "react";
 import { colors } from "../utils/colors";
-import { Rect } from "react-native-svg";
 
 type Props = {
   xValues: number[];

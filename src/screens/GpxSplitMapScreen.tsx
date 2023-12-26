@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
   Pressable,
-  Alert,
   Text,
   ActivityIndicator,
   Dimensions,
@@ -11,8 +10,6 @@ import {
 import Slider from "@react-native-community/slider";
 
 import * as FileSystem from "expo-file-system";
-import { point, distance } from "@turf/turf";
-import { LineChart } from "react-native-chart-kit";
 
 // For web, consider @teovilla/react-native-web-maps
 // e.g. https://stackoverflow.com/a/76702937/2288934
@@ -27,7 +24,6 @@ import {
   calculateCumulativeDistance,
   parseGpxFile,
 } from "../utils/gpx";
-import { EasyLineChart } from "../components/EasyLineChart";
 import { GpxChartingModule } from "../components/GpxChartingModule";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GpxSplitMap">;

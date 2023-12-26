@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Pressable, Alert, Text } from "react-native";
 
-import { ResizeMode, Video } from "expo-av";
 import * as Font from "expo-font";
 import { registerRootComponent } from "expo";
 
