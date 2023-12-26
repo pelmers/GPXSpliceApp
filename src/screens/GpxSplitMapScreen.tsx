@@ -153,6 +153,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
         </Pressable>
       </View>
       <View style={styles.chartContainer}>
+        {/* TODO: add a vertical line in the chart to show the split point */}
         <GpxChartingModule
           points={gpx.points}
           chartWidth={Dimensions.get("window").width - 4}

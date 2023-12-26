@@ -88,6 +88,7 @@ function computeXYValues(points: GpxPoint[], chartType: ChartTypes) {
         yValues.push(point.altitude!);
         break;
       case "speed":
+        // TODO: do something about crazy speed values from gps recordings
         // speed is distance / time, so it needs 2 points
         if (i == 0) {
           yValues.push(0);

@@ -2,6 +2,7 @@
 import { LineChart } from "react-native-chart-kit";
 import React from "react";
 import { colors } from "../utils/colors";
+import { Rect } from "react-native-svg";
 
 type Props = {
   xValues: number[];
@@ -40,12 +41,13 @@ function EasyLineChart_(props: Props) {
   if (xValues.length !== yValues.length) {
     throw new Error("xValues and yValues must have the same length");
   }
-  if (xValues.length < 2) {
-    return null;
-  }
   // If the data length is larger than maxPoints, then resample with interpolation
   let resampledXValues = resample(xValues, maxPoints);
   let resampledYValues = resample(yValues, maxPoints);
+  if (resampledXValues.length < 2) {
+    console.log("Not enough data to display chart?");
+    return null;
+  }
 
   const xAxisValuesToShow = new Set();
   for (let i = 0; i < resampledXValues.length; i++) {
@@ -53,8 +55,6 @@ function EasyLineChart_(props: Props) {
       xAxisValuesToShow.add(i);
     }
   }
-  const yAxisRange =
-    Math.max(...resampledYValues) - Math.min(...resampledYValues);
 
   return (
     <LineChart
@@ -63,24 +63,26 @@ function EasyLineChart_(props: Props) {
         datasets: [
           {
             data: resampledYValues,
+            color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
           },
         ],
       }}
       width={props.width}
       height={props.height}
-      yAxisInterval={yAxisRange / segments}
+      yAxisInterval={resampledYValues.length}
       yAxisSuffix={props.yAxisUnits}
+      segments={segments}
       formatXLabel={(value) =>
         xAxisValuesToShow.has(parseFloat(value))
           ? resampledXValues[parseFloat(value)].toFixed(1)
           : ""
       }
+      withDots={false}
       chartConfig={{
         backgroundColor: colors.dark,
         backgroundGradientFrom: colors.dark,
         backgroundGradientTo: colors.dark,
         decimalPlaces: 1,
-        strokeWidth: 4,
         color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
         labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
         propsForDots: {
