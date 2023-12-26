@@ -1,14 +1,39 @@
 // import { LineChart } from "react-native-wagmi-charts";
 import { LineChart } from "react-native-chart-kit";
 import React from "react";
+import { colors } from "../utils/colors";
 
 type Props = {
   xValues: number[];
   yValues: number[];
+  yAxisUnits: string;
   maxPoints: number;
   width: number;
   height: number;
 };
+
+const segments = 4;
+
+function resample(values: number[], maxPoints: number) {
+  if (values.length <= maxPoints) {
+    return values;
+  }
+  const resampled = [];
+  const interval = (values.length - 1) / (maxPoints - 1);
+
+  for (let i = 0; i < maxPoints; i++) {
+    const index = Math.floor(i * interval);
+    if (index === values.length - 1) {
+      resampled.push(values[index]);
+    } else {
+      const fraction = i * interval - index;
+      resampled.push(
+        values[index] + fraction * (values[index + 1] - values[index]),
+      );
+    }
+  }
+  return resampled;
+}
 
 function EasyLineChart_(props: Props) {
   const { xValues, yValues, maxPoints } = props;
@@ -19,30 +44,17 @@ function EasyLineChart_(props: Props) {
     return null;
   }
   // If the data length is larger than maxPoints, then resample with interpolation
-  let resampledXValues = xValues;
-  let resampledYValues = yValues;
+  let resampledXValues = resample(xValues, maxPoints);
+  let resampledYValues = resample(yValues, maxPoints);
 
-  if (xValues.length > maxPoints) {
-    const interval = (xValues.length - 1) / (maxPoints - 1);
-    resampledXValues = [];
-    resampledYValues = [];
-
-    for (let i = 0; i < maxPoints; i++) {
-      const index = Math.floor(i * interval);
-      if (index === xValues.length - 1) {
-        resampledXValues.push(xValues[index]);
-        resampledYValues.push(yValues[index]);
-      } else {
-        const fraction = i * interval - index;
-        resampledXValues.push(
-          xValues[index] + fraction * (xValues[index + 1] - xValues[index]),
-        );
-        resampledYValues.push(
-          yValues[index] + fraction * (yValues[index + 1] - yValues[index]),
-        );
-      }
+  const xAxisValuesToShow = new Set();
+  for (let i = 0; i < resampledXValues.length; i++) {
+    if (i % (Math.floor(resampledXValues.length / segments) - 1) === 0) {
+      xAxisValuesToShow.add(i);
     }
   }
+  const yAxisRange =
+    Math.max(...resampledYValues) - Math.min(...resampledYValues);
 
   return (
     <LineChart
@@ -56,36 +68,32 @@ function EasyLineChart_(props: Props) {
       }}
       width={props.width}
       height={props.height}
+      yAxisInterval={yAxisRange / segments}
+      yAxisSuffix={props.yAxisUnits}
+      formatXLabel={(value) =>
+        xAxisValuesToShow.has(parseFloat(value))
+          ? resampledXValues[parseFloat(value)].toFixed(1)
+          : ""
+      }
       chartConfig={{
-        backgroundColor: "#e26a00",
-        decimalPlaces: 2,
+        backgroundColor: colors.dark,
+        backgroundGradientFrom: colors.dark,
+        backgroundGradientTo: colors.dark,
+        decimalPlaces: 1,
+        strokeWidth: 4,
         color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
         labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-        style: {
-          borderRadius: 16,
-        },
         propsForDots: {
+          // no dots, just line
           r: "0",
-          strokeWidth: "2",
-          stroke: "#ffa726",
         },
       }}
       style={{
         marginVertical: 8,
         borderRadius: 16,
       }}
-
-      // ... other props
     />
   );
-
-  //   return (
-  //     <LineChart.Provider data={data}>
-  //       <LineChart width={props.width} height={props.height}>
-  //         <LineChart.Path />
-  //       </LineChart>
-  //     </LineChart.Provider>
-  //   );
 }
 
 export const EasyLineChart = React.memo(EasyLineChart_);

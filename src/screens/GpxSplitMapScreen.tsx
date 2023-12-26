@@ -155,7 +155,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
       <View style={styles.chartContainer}>
         <GpxChartingModule
           points={gpx.points}
-          chartWidth={Dimensions.get("window").width}
+          chartWidth={Dimensions.get("window").width - 4}
           chartHeight={200}
         />
       </View>
@@ -229,6 +229,6 @@ const styles = StyleSheet.create({
     fontFamily: "BebasNeue-Regular",
   },
   chartContainer: {
-    flex: 4,
+    flex: 5.6,
   },
 });

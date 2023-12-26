@@ -58,6 +58,23 @@ function enabledForType(chartType: ChartTypes, points: GpxPoint[]) {
   }
 }
 
+function yAxisUnitsForType(chartType: ChartTypes) {
+  switch (chartType) {
+    case "elevation":
+      return "m";
+    case "speed":
+      return "kph";
+    case "heartrate":
+      return "";
+    case "cadence":
+      return "rpm";
+    case "power":
+      return "W";
+    case "temperature":
+      return "°C";
+  }
+}
+
 function computeXYValues(points: GpxPoint[], chartType: ChartTypes) {
   if (!enabledForType(chartType, points)) {
     throw new Error("Chart type not enabled for this data");
@@ -149,6 +166,7 @@ export function GpxChartingModule_(props: Props) {
         <EasyLineChart
           xValues={xValues}
           yValues={yValues}
+          yAxisUnits={yAxisUnitsForType(chartType)}
           maxPoints={100}
           width={props.chartWidth}
           height={props.chartHeight}
