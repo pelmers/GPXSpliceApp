@@ -10,10 +10,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SplitEntryScreen } from "./screens/SplitEntryScreen";
 import { StravaActivitiesScreen } from "./screens/StravaActivitiesScreen";
 import { GpxSplitMapScreen } from "./screens/GpxSplitMapScreen";
+import { PostSplitScreen } from "./screens/PostSplitScreen";
 
 // Title page: autoplays banner.mp4 in top half of page, shows 2 buttons below that, centered
 // button 1: split GPS file
 // button 2: combine GPS files
+// TODO button 3 settings page
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -46,12 +48,10 @@ export default function App() {
           component={HomeScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="SplitEntry" component={SplitEntryScreen} />
-        <Stack.Screen
-          name="StravaActivities"
-          component={StravaActivitiesScreen}
-        />
-        <Stack.Screen name="GpxSplitMap" component={GpxSplitMapScreen} />
+        <Stack.Screen name="Split" component={SplitEntryScreen} />
+        <Stack.Screen name="Strava List" component={StravaActivitiesScreen} />
+        <Stack.Screen name="Split Map" component={GpxSplitMapScreen} />
+        <Stack.Screen name="Post Split" component={PostSplitScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

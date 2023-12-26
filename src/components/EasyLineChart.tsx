@@ -12,7 +12,7 @@ type Props = {
   height: number;
 };
 
-const segments = 4;
+const segments = 5;
 
 function resample(values: number[], maxPoints: number) {
   if (values.length <= maxPoints) {
@@ -35,6 +35,7 @@ function resample(values: number[], maxPoints: number) {
   return resampled;
 }
 
+// Overall not a fan of this react native chart kit library, but I guess it's okay for now...
 function EasyLineChart_(props: Props) {
   const { xValues, yValues, maxPoints } = props;
   if (xValues.length !== yValues.length) {

@@ -26,7 +26,7 @@ import {
 } from "../utils/gpx";
 import { GpxChartingModule } from "../components/GpxChartingModule";
 
-type Props = NativeStackScreenProps<RootStackParamList, "GpxSplitMap">;
+type Props = NativeStackScreenProps<RootStackParamList, "Split Map">;
 
 // MapView usage docs: https://docs.expo.dev/versions/latest/sdk/map-view/
 
@@ -67,11 +67,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
   const splitMarkerValue =
     distances.length > 0 ? `${distances[sliderIndex].toFixed(1)} km` : "";
 
-  // TODO: compute cumulative distances and show that in the split marker
   // TODO: set up a units layer so that the user can choose between miles and km
-  // TODO: show profile graphs: distance, elevation, speed, heartrate
-  // TODO: show a heartrate profile if the data is available
-  // TODO: charting library: https://github.com/coinjar/react-native-wagmi-charts
   return (
     <View style={styles.container}>
       <Text style={styles.titleText}>{titleText}</Text>
@@ -142,6 +138,11 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
             // TODO: navigate to the post split screen, sending the split file + split index + strava token as prop
             // TODO: the post split screen will show the 2 activities each with a summary and each has a button to save or upload to strava (which will have private/public checkbox)
             console.log("Split button pressed");
+            navigation.navigate("Post Split", {
+              gpxFileUri,
+              splitIndex: sliderIndex,
+              stravaAccessToken,
+            });
           }}
           style={styles.splitButton}
         >

@@ -8,7 +8,7 @@ import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 
-type Props = NativeStackScreenProps<RootStackParamList, "SplitEntry">;
+type Props = NativeStackScreenProps<RootStackParamList, "Split">;
 
 async function getGpxFileUri(): Promise<string> {
   const result = await DocumentPicker.getDocumentAsync({
@@ -60,7 +60,7 @@ export function SplitEntryScreen({ navigation }: Props) {
           "Without write permission, I cannot help you upload activities after splitting!",
         );
       }
-      navigation.navigate("StravaActivities", {
+      navigation.navigate("Strava List", {
         accessToken,
         mode: "split",
         athlete: payload.athlete,
@@ -77,7 +77,7 @@ export function SplitEntryScreen({ navigation }: Props) {
           try {
             const fileUri = await getGpxFileUri();
             setError(null);
-            navigation.navigate("GpxSplitMap", { gpxFileUri: fileUri });
+            navigation.navigate("Split Map", { gpxFileUri: fileUri });
           } catch (e) {
             setError((e as Error).message);
           }

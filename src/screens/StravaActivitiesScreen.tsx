@@ -24,7 +24,7 @@ import {
 import { StravaActivityRow } from "../components/StravaActivityRow";
 import { LoadingModal } from "../components/LoadingModal";
 
-type Props = NativeStackScreenProps<RootStackParamList, "StravaActivities">;
+type Props = NativeStackScreenProps<RootStackParamList, "Strava List">;
 
 function displayAthlete(athlete: StravaAthlete) {
   // Render a banner that shows information about the logged in athlete
@@ -99,7 +99,7 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
                 const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
                 await FileSystem.writeAsStringAsync(fileUri, gpxContents);
                 // navigate to next screen
-                navigation.navigate("GpxSplitMap", {
+                navigation.navigate("Split Map", {
                   gpxFileUri: fileUri,
                   stravaAccessToken: accessToken,
                 });

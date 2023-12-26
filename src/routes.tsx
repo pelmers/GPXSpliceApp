@@ -2,18 +2,18 @@ import { StravaAthlete } from "./types/strava";
 
 export type RootStackParamList = {
   Home: undefined;
-  SplitEntry: undefined;
-  StravaActivities: {
+  Split: undefined;
+  "Strava List": {
     accessToken: string;
     mode: "split" | "combine";
     athlete: StravaAthlete;
   };
-  GpxSplitMap: {
+  "Split Map": {
     gpxFileUri: string;
     stravaAccessToken?: string;
   };
-  PostSplit: {
-    stravaAccessToken: string;
+  "Post Split": {
+    stravaAccessToken?: string;
     splitIndex: number;
     gpxFileUri: string;
   };
