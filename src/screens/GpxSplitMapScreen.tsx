@@ -22,28 +22,17 @@ import { Polyline, Marker } from "react-native-maps";
 import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
-import { GpxPoint, parseGpxFile } from "../utils/gpx";
+import {
+  GpxPoint,
+  calculateCumulativeDistance,
+  parseGpxFile,
+} from "../utils/gpx";
 import { EasyLineChart } from "../components/EasyLineChart";
+import { GpxChartingModule } from "../components/GpxChartingModule";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GpxSplitMap">;
 
 // MapView usage docs: https://docs.expo.dev/versions/latest/sdk/map-view/
-
-function calculateCumulativeDistance(points: GpxPoint[]): number[] {
-  let cumulativeDistance = 0;
-  const cumulativeDistances = [0];
-
-  for (let i = 1; i < points.length; i++) {
-    const from = point([points[i - 1].latlng[1], points[i - 1].latlng[0]]);
-    const to = point([points[i].latlng[1], points[i].latlng[0]]);
-    const segmentDistance = distance(from, to, { units: "kilometers" });
-
-    cumulativeDistance += segmentDistance;
-    cumulativeDistances.push(cumulativeDistance);
-  }
-
-  return cumulativeDistances;
-}
 
 export function GpxSplitMapScreen({ navigation, route }: Props) {
   const [gpx, setGpx] = useState<{
@@ -54,21 +43,14 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
   const [sliderValue, setSliderValue] = useState(0);
   const [distances, setDistances] = useState<number[]>([]);
 
-  useEffect(() => {
-    // Update distances when gpx changes
-    if (gpx) {
-      setDistances(calculateCumulativeDistance(gpx.points));
-    }
-  }, [gpx]);
-  const xValues = useMemo(() => distances.map((_, idx) => idx), [distances]);
-  const yValues = useMemo(() => distances, [distances]);
-
   const { gpxFileUri, stravaAccessToken } = route.params;
   // Read the gpx file on mount
   useEffect(() => {
     async function readGpxFile() {
       const fileContents = await FileSystem.readAsStringAsync(gpxFileUri);
-      setGpx(parseGpxFile(fileContents));
+      const parsedGpx = parseGpxFile(fileContents);
+      setGpx(parsedGpx);
+      setDistances(calculateCumulativeDistance(parsedGpx.points));
     }
     readGpxFile();
   }, [gpxFileUri]);
@@ -171,12 +153,10 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
         </Pressable>
       </View>
       <View style={styles.chartContainer}>
-        <EasyLineChart
-          xValues={xValues}
-          yValues={yValues}
-          maxPoints={100}
-          width={Dimensions.get("window").width} // from react-native
-          height={220}
+        <GpxChartingModule
+          points={gpx.points}
+          chartWidth={Dimensions.get("window").width}
+          chartHeight={200}
         />
       </View>
     </View>

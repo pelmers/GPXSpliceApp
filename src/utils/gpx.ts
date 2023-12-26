@@ -1,3 +1,5 @@
+import { point as turfPoint, distance as turfDistance } from "@turf/turf";
+
 import { XMLParser } from "fast-xml-parser";
 
 export type GpxPoint = { latlng: [number, number] } & Partial<{
@@ -7,7 +9,7 @@ export type GpxPoint = { latlng: [number, number] } & Partial<{
   distance: number;
   heartrate: number;
   altitude: number;
-  time: number;
+  time: string;
 }>;
 
 // Converts a list of points into a gpx file
@@ -87,4 +89,20 @@ export function parseGpxFile(gpxContents: string): {
     }),
   );
   return { points, name, type };
+}
+
+export function calculateCumulativeDistance(points: GpxPoint[]): number[] {
+  let cumulativeDistance = 0;
+  const cumulativeDistances = [0];
+
+  for (let i = 1; i < points.length; i++) {
+    const from = turfPoint([points[i - 1].latlng[1], points[i - 1].latlng[0]]);
+    const to = turfPoint([points[i].latlng[1], points[i].latlng[0]]);
+    const segmentDistance = turfDistance(from, to, { units: "kilometers" });
+
+    cumulativeDistance += segmentDistance;
+    cumulativeDistances.push(cumulativeDistance);
+  }
+
+  return cumulativeDistances;
 }
