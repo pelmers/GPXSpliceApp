@@ -36,7 +36,6 @@ export function LoadingModal(props: { visible: boolean }) {
   );
 }
 
-// TODO: pretty colors and styles
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,

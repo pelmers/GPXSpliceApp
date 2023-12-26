@@ -75,6 +75,7 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
 
   // TODO: paginate when scrolling to bottom of list
   // TODO: implement drag up to refresh
+  // TODO: look at this query library? tanstack/use-query, e.g. https://github.com/TanStack/query/discussions/1275
   return (
     <View style={styles.container}>
       <LoadingModal visible={loadingModal} />
@@ -101,7 +102,7 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
                 const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
                 await FileSystem.writeAsStringAsync(fileUri, gpxContents);
                 // navigate to next screen
-                navigation.navigate("GpxSplitMap", { gpxFileUri: fileUri });
+                navigation.navigate("GpxSplitMap", { gpxFileUri: fileUri, stravaAccessToken: accessToken });
               } catch (e) {
                 setError((e as Error).message);
                 console.error(e);
@@ -118,7 +119,6 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
   );
 }
 
-// TODO: pretty colors and styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,

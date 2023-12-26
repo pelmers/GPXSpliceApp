@@ -1,5 +1,7 @@
 import { StyleSheet, View, Pressable, Text } from "react-native";
 
+import humanizeDuration from "humanize-duration";
+
 import { colors } from "../utils/colors";
 import { StravaActivity } from "../types/strava";
 
@@ -61,7 +63,10 @@ type Props = {
 export function StravaActivityRow(props: Props) {
   const { activity } = props;
   const typeEmoji = getActivityEmoji(activity);
-  const hasGps = activity.map != null && activity.map.summary_polyline != null;
+  const hasGps =
+    activity.map != null &&
+    activity.map.summary_polyline != null &&
+    activity.map.summary_polyline.length > 0;
   const distanceKm = activity.distance
     ? (activity.distance / 1000).toFixed(2)
     : null;
@@ -69,11 +74,18 @@ export function StravaActivityRow(props: Props) {
   const duration = activity.moving_time
     ? formatDuration(activity.moving_time)
     : null;
+  const timeSinceActivity = activity.start_date
+    ? Date.now() - Date.parse(activity.start_date)
+    : null;
   const publicText = activity.private ? "🔒" : "🌎";
   return (
     <View>
       <Pressable
-        style={styles.activityInfoContainer}
+        style={
+          hasGps
+            ? styles.activityInfoContainer
+            : styles.disabledActivityInfoContainer
+        }
         onPress={() => props.onPress(activity)}
         disabled={!hasGps}
       >
@@ -81,7 +93,18 @@ export function StravaActivityRow(props: Props) {
           <Text style={{ fontSize: 30 }}>{typeEmoji}</Text>
         </View>
         <View>
-          <Text style={styles.activityInfoNameText}>{activity.name}</Text>
+          <View style={{ flexDirection: "row" }}>
+          <Text style={styles.activityInfoTimeSinceText}>{activity.name}</Text>
+            {timeSinceActivity && (
+              <Text style={styles.activityInfoRowExtraText}>
+                {humanizeDuration(timeSinceActivity, {
+                  largest: 1,
+                  round: true,
+                })}{" "}
+                ago
+              </Text>
+            )}
+          </View>
           <View style={{ flexDirection: "row" }}>
             <Text style={styles.activityInfoRowExtraText}>{publicText}</Text>
             {duration && (
@@ -119,9 +142,23 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     paddingHorizontal: 15,
   },
+  disabledActivityInfoContainer: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    marginBottom: 5,
+    paddingHorizontal: 15,
+    opacity: 0.6,
+  },
   activityInfoNameText: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  activityInfoTimeSinceText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    paddingRight: 10,
   },
   activityInfoRowExtraText: {
     fontSize: 14,

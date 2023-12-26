@@ -164,16 +164,11 @@ function stravaStreamsToGpx(
   // Keep all the streams with data of the same length
   const points: GpxPoint[] = [];
   for (let i = 0; i < n_points; i++) {
-    const point: GpxPoint = {};
+    const point: { [key: string]: any } = {};
     streams.forEach((s) => {
-      // Funny branching here to make the type checker happy
-      if (s.type === "latlng") {
-        point[s.type] = s.data[i];
-      } else {
-        point[s.type] = s.data[i];
-      }
+      point[s.type] = s.data[i];
     });
-    points.push(point);
+    points.push(point as GpxPoint);
   }
 
   return pointsToGpx(

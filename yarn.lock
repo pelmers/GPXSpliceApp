@@ -2131,6 +2131,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/humanize-duration@^3.27.3":
+  version "3.27.3"
+  resolved "https://registry.yarnpkg.com/@types/humanize-duration/-/humanize-duration-3.27.3.tgz#fa49ada1cc65222d5f1295c7756b6877f5a96bcf"
+  integrity sha512-wiiiFYjnrYDJE/ujU7wS/NShqp12IKrejozjDtcejP0zYi+cjyjVcfZHwcFUDKVJ7tHGsmgeW2ED92ABIIjfpg==
+
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.6.tgz#7739c232a1fee9b4d3ce8985f314c0c6d33549d7"
@@ -4911,6 +4916,11 @@ human-signals@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
+
+humanize-duration@^3.31.0:
+  version "3.31.0"
+  resolved "https://registry.yarnpkg.com/humanize-duration/-/humanize-duration-3.31.0.tgz#a0384d22555024cd17e6e9f8561540d37756bf4c"
+  integrity sha512-fRrehgBG26NNZysRlTq1S+HPtDpp3u+Jzdc/d5A4cEzOD86YLAkDaJyJg8krSdCi7CJ+s7ht3fwRj8Dl+Btd0w==
 
 hyphenate-style-name@^1.0.3:
   version "1.0.4"

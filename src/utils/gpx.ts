@@ -1,7 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 
-export type GpxPoint = {latlng: [number, number]} &
-Partial<{
+export type GpxPoint = { latlng: [number, number] } & Partial<{
   temp: number;
   watts: number;
   cadence: number;

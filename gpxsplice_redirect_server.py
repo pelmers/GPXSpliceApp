@@ -19,11 +19,16 @@ class RedirectHandler(BaseHTTPRequestHandler):
         # Parse the URL and parameters
         parsed_url = urlparse(self.path)
         params = parse_qs(parsed_url.query)
+        use_mobile = 'mobile' in parsed_url.path
 
-        # Construct the new URL with the app scheme (see app.json)
-        client_url = f"gpxsplice://{parsed_url.path}"
-        # NOTE: during development use the "exp" scheme for the Expo Go app
-        client_url = f"exp://{parsed_url.path}"
+        if use_mobile:
+            # Construct the new URL with the app scheme (see app.json)
+            client_url = f"gpxsplice://{parsed_url.path}"
+            # NOTE: during development use the "exp" scheme for the Expo Go app
+            client_url = f"exp://{parsed_url.path}"
+        else:
+            # TODO
+            client_url = f"https://future-domain-name-for-this-app/{parsed_url.path}"
 
         # Perform key exchange with the Strava API by sending the code with client id and secret
         if 'code' not in params:

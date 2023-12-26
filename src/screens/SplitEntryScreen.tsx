@@ -40,7 +40,8 @@ export function SplitEntryScreen({ navigation }: Props) {
       clientId: "118471",
       // Not sure why but scopes need to be a single string, otherwise strava gives a 400 error
       scopes: ["activity:read_all,activity:write"],
-      redirectUri: "https://gpxspliceredirect.pelmers.com",
+      // TODO: add a different redirect path for web platform
+      redirectUri: "https://gpxspliceredirect.pelmers.com/mobile",
     },
     {
       authorizationEndpoint: "https://www.strava.com/oauth/mobile/authorize",

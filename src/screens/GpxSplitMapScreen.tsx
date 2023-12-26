@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Pressable, Alert, Text } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Alert,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 import Slider from "@react-native-community/slider";
 
 import * as FileSystem from "expo-file-system";
@@ -12,7 +19,6 @@ import { Polyline, Marker } from "react-native-maps";
 import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
-import { LoadingModal } from "../components/LoadingModal";
 import { GpxPoint, parseGpxFile } from "../utils/gpx";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GpxSplitMap">;
@@ -20,7 +26,6 @@ type Props = NativeStackScreenProps<RootStackParamList, "GpxSplitMap">;
 // MapView usage docs: https://docs.expo.dev/versions/latest/sdk/map-view/
 
 export function GpxSplitMapScreen({ navigation, route }: Props) {
-  const [loadingModal, setLoadingModal] = useState(false);
   const [gpx, setGpx] = useState<{
     points: GpxPoint[];
     name: string;
@@ -28,17 +33,12 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
   } | null>(null);
   const [sliderValue, setSliderValue] = useState(0);
 
-  const { gpxFileUri } = route.params;
+  const { gpxFileUri, stravaAccessToken } = route.params;
   // Read the gpx file on mount
   useEffect(() => {
     async function readGpxFile() {
-      try {
-        setLoadingModal(true);
-        const fileContents = await FileSystem.readAsStringAsync(gpxFileUri);
-        setGpx(parseGpxFile(fileContents));
-      } finally {
-        setLoadingModal(false);
-      }
+      const fileContents = await FileSystem.readAsStringAsync(gpxFileUri);
+      setGpx(parseGpxFile(fileContents));
     }
     readGpxFile();
   }, [gpxFileUri]);
@@ -46,8 +46,8 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
   if (!gpx) {
     return (
       <View style={styles.container}>
-        <LoadingModal visible={loadingModal} />
         <Text style={styles.titleText}>Loading...</Text>
+        <ActivityIndicator size="large" color={colors.secondary} />
       </View>
     );
   }
@@ -56,6 +56,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
     Math.floor(sliderValue * gpx.points.length),
     gpx.points.length - 1,
   );
+
   // TODO: compute cumulative distances and show that in the split marker
   // TODO: set up a units layer so that the user can choose between miles and km
   // TODO: show an elevation profile
@@ -125,7 +126,10 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
           onValueChange={(value) => setSliderValue(value)}
         />
         <Pressable
-          onPress={() => console.log("Split button pressed")}
+          onPress={() => {
+            // TODO: navigate to the post split screen, sending the split file + split index + strava token as prop
+            // TODO: the post split screen will show the 2 activities each with a summary and each has a button to save or upload to strava (which will have private/public checkbox)
+            console.log("Split button pressed")}}
           style={styles.splitButton}
         >
           <Text style={styles.splitButtonText}>SPLIT</Text>

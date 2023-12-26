@@ -10,5 +10,11 @@ export type RootStackParamList = {
   };
   GpxSplitMap: {
     gpxFileUri: string;
+    stravaAccessToken?: string;
   };
+  PostSplit: {
+    stravaAccessToken: string;
+    splitIndex: number;
+    gpxFileUri: string;
+  }
 };
