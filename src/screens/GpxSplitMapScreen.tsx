@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   StyleSheet,
   View,
@@ -6,10 +6,13 @@ import {
   Alert,
   Text,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import Slider from "@react-native-community/slider";
 
 import * as FileSystem from "expo-file-system";
+import { point, distance } from "@turf/turf";
+import { LineChart } from "react-native-chart-kit";
 
 // For web, consider @teovilla/react-native-web-maps
 // e.g. https://stackoverflow.com/a/76702937/2288934
@@ -20,10 +23,27 @@ import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import { GpxPoint, parseGpxFile } from "../utils/gpx";
+import { EasyLineChart } from "../components/EasyLineChart";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GpxSplitMap">;
 
 // MapView usage docs: https://docs.expo.dev/versions/latest/sdk/map-view/
+
+function calculateCumulativeDistance(points: GpxPoint[]): number[] {
+  let cumulativeDistance = 0;
+  const cumulativeDistances = [0];
+
+  for (let i = 1; i < points.length; i++) {
+    const from = point([points[i - 1].latlng[1], points[i - 1].latlng[0]]);
+    const to = point([points[i].latlng[1], points[i].latlng[0]]);
+    const segmentDistance = distance(from, to, { units: "kilometers" });
+
+    cumulativeDistance += segmentDistance;
+    cumulativeDistances.push(cumulativeDistance);
+  }
+
+  return cumulativeDistances;
+}
 
 export function GpxSplitMapScreen({ navigation, route }: Props) {
   const [gpx, setGpx] = useState<{
@@ -32,6 +52,16 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
     type: string;
   } | null>(null);
   const [sliderValue, setSliderValue] = useState(0);
+  const [distances, setDistances] = useState<number[]>([]);
+
+  useEffect(() => {
+    // Update distances when gpx changes
+    if (gpx) {
+      setDistances(calculateCumulativeDistance(gpx.points));
+    }
+  }, [gpx]);
+  const xValues = useMemo(() => distances.map((_, idx) => idx), [distances]);
+  const yValues = useMemo(() => distances, [distances]);
 
   const { gpxFileUri, stravaAccessToken } = route.params;
   // Read the gpx file on mount
@@ -56,13 +86,14 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
     Math.floor(sliderValue * gpx.points.length),
     gpx.points.length - 1,
   );
+  const splitMarkerValue =
+    distances.length > 0 ? `${distances[sliderIndex].toFixed(1)} km` : "";
 
   // TODO: compute cumulative distances and show that in the split marker
   // TODO: set up a units layer so that the user can choose between miles and km
-  // TODO: show an elevation profile
-  // TODO: show a speed profile (maybe with a switch between them to save space)
+  // TODO: show profile graphs: distance, elevation, speed, heartrate
   // TODO: show a heartrate profile if the data is available
-  // charting library: https://github.com/coinjar/react-native-wagmi-charts
+  // TODO: charting library: https://github.com/coinjar/react-native-wagmi-charts
   return (
     <View style={styles.container}>
       <Text style={styles.titleText}>{titleText}</Text>
@@ -103,9 +134,12 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
           title="Split"
           description="This is the split point"
         >
-          <Text style={styles.splitMarkerText}>
-            {(100 * sliderValue).toFixed(1) + "%"}
-          </Text>
+          <View style={styles.splitMarkerContainer}>
+            <View style={styles.splitMarkerCaret} />
+            <View style={styles.splitMarkerBox}>
+              <Text style={styles.splitMarkerText}>{splitMarkerValue}</Text>
+            </View>
+          </View>
         </Marker>
         <Polyline
           coordinates={gpx.points.map((point) => ({
@@ -129,11 +163,21 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
           onPress={() => {
             // TODO: navigate to the post split screen, sending the split file + split index + strava token as prop
             // TODO: the post split screen will show the 2 activities each with a summary and each has a button to save or upload to strava (which will have private/public checkbox)
-            console.log("Split button pressed")}}
+            console.log("Split button pressed");
+          }}
           style={styles.splitButton}
         >
           <Text style={styles.splitButtonText}>SPLIT</Text>
         </Pressable>
+      </View>
+      <View style={styles.chartContainer}>
+        <EasyLineChart
+          xValues={xValues}
+          yValues={yValues}
+          maxPoints={100}
+          width={Dimensions.get("window").width} // from react-native
+          height={220}
+        />
       </View>
     </View>
   );
@@ -156,7 +200,27 @@ const styles = StyleSheet.create({
   splitMarkerText: {
     fontSize: 30,
     color: colors.light,
-    marginTop: 50,
+  },
+  splitMarkerContainer: {
+    alignItems: "center",
+    position: "absolute",
+    // positions the marker caret on the split point (hopefully works across devices?)
+    right: -48,
+    top: 0,
+  },
+  splitMarkerCaret: {
+    width: 0,
+    height: 0,
+    backgroundColor: "transparent",
+    borderStyle: "solid",
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderBottomWidth: 20,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderBottomColor: colors.dark,
+  },
+  splitMarkerBox: {
     backgroundColor: colors.dark,
     padding: 2,
     opacity: 0.8,
@@ -183,5 +247,8 @@ const styles = StyleSheet.create({
     color: colors.light,
     fontSize: 24,
     fontFamily: "BebasNeue-Regular",
+  },
+  chartContainer: {
+    flex: 4,
   },
 });

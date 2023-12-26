@@ -94,16 +94,7 @@ export function StravaActivityRow(props: Props) {
         </View>
         <View>
           <View style={{ flexDirection: "row" }}>
-          <Text style={styles.activityInfoTimeSinceText}>{activity.name}</Text>
-            {timeSinceActivity && (
-              <Text style={styles.activityInfoRowExtraText}>
-                {humanizeDuration(timeSinceActivity, {
-                  largest: 1,
-                  round: true,
-                })}{" "}
-                ago
-              </Text>
-            )}
+            <Text style={styles.activityInfoNameText}>{activity.name}</Text>
           </View>
           <View style={{ flexDirection: "row" }}>
             <Text style={styles.activityInfoRowExtraText}>{publicText}</Text>
@@ -117,6 +108,15 @@ export function StravaActivityRow(props: Props) {
             )}
             {location && (
               <Text style={styles.activityInfoRowExtraText}>{location}</Text>
+            )}
+            {timeSinceActivity && (
+              <Text style={styles.activityInfoRowExtraText}>
+                {humanizeDuration(timeSinceActivity, {
+                  largest: 1,
+                  round: true,
+                })}{" "}
+                ago
+              </Text>
             )}
           </View>
         </View>
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   activityInfoContainer: {
     flex: 1,
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     alignItems: "center",
     marginBottom: 5,
     paddingHorizontal: 15,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   disabledActivityInfoContainer: {
     flex: 1,
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     alignItems: "center",
     marginBottom: 5,
     paddingHorizontal: 15,

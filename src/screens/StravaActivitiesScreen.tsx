@@ -102,7 +102,10 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
                 const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
                 await FileSystem.writeAsStringAsync(fileUri, gpxContents);
                 // navigate to next screen
-                navigation.navigate("GpxSplitMap", { gpxFileUri: fileUri, stravaAccessToken: accessToken });
+                navigation.navigate("GpxSplitMap", {
+                  gpxFileUri: fileUri,
+                  stravaAccessToken: accessToken,
+                });
               } catch (e) {
                 setError((e as Error).message);
                 console.error(e);

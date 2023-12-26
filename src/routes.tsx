@@ -16,5 +16,5 @@ export type RootStackParamList = {
     stravaAccessToken: string;
     splitIndex: number;
     gpxFileUri: string;
-  }
+  };
 };
