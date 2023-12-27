@@ -7,6 +7,8 @@ node_modules/
 .expo/
 dist/
 web-build/
+android
+ios
 
 # Native
 *.orig.*
@@ -15,6 +17,7 @@ web-build/
 *.p12
 *.key
 *.mobileprovision
+*.aab
 
 # Metro
 .metro-health-check*

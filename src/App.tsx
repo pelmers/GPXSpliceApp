@@ -55,7 +55,10 @@ export default function App() {
         <Stack.Screen name="Post Split" component={PostSplitScreen} />
         <Stack.Screen name="Combine" component={CombineEntryScreen} />
         <Stack.Screen name="Combine Preview" component={CombinePreviewScreen} />
-        <Stack.Screen name="Combine (Strava)" component={StravaCombineActivitiesScreen} />
+        <Stack.Screen
+          name="Combine (Strava)"
+          component={StravaCombineActivitiesScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

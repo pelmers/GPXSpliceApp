@@ -125,7 +125,9 @@ export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
       <View style={{ flexBasis: 25 }}>
         {error && <Text style={styles.errorText}>{error}</Text>}
         {!error && (
-          <Text style={styles.instructionText}>Select multiple activities to combine</Text>
+          <Text style={styles.instructionText}>
+            Select multiple activities to combine
+          </Text>
         )}
         {loadingInline && (
           <ActivityIndicator size="large" color={colors.secondary} />
@@ -166,7 +168,7 @@ export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
           style={styles.combineButton}
           onPress={fetchAllSelectedActivities}
         >
-          <Text style={styles.combineButtonText}>COMBINE</Text>
+          <Text style={styles.combineButtonText}>COMBINE 👟</Text>
         </Pressable>
       )}
     </View>
@@ -208,17 +210,18 @@ const styles = StyleSheet.create({
   combineButton: {
     position: "absolute",
     bottom: 0,
-    left: 0,
     right: 0,
-    height: 50,
-    backgroundColor: colors.primary, // replace with your preferred color
+    left: 0,
+    height: 65,
+    backgroundColor: colors.primary,
+    borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
   },
   combineButtonText: {
     color: "white",
     fontFamily: "BebasNeue-Regular",
-    fontSize: 36,
+    fontSize: 40,
     fontWeight: "bold",
   },
 });

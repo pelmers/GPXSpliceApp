@@ -19,24 +19,21 @@ class RedirectHandler(BaseHTTPRequestHandler):
         # Parse the URL and parameters
         parsed_url = urlparse(self.path)
         params = parse_qs(parsed_url.query)
-        use_mobile = 'mobile' in parsed_url.path
+        if 'client_uri' not in params:
+            print(f"Missing client_uri in request: {self.path}")
+            self.send_response(400)
+            self.end_headers()
+            return
 
-        if use_mobile:
-            # Construct the new URL with the app scheme (see app.json)
-            client_url = f"gpxsplice://{parsed_url.path}"
-            # NOTE: during development use the "exp" scheme for the Expo Go app
-            client_url = f"exp://{parsed_url.path}"
-        else:
-            # TODO web-specific URL path
-            client_url = f"https://future-domain-name-for-this-app/{parsed_url.path}"
+        client_uri = params['client_uri'][0]
 
         # Perform key exchange with the Strava API by sending the code with client id and secret
         if 'code' not in params:
             print(f"Missing code in request: {self.path}")
             # Redirect back to client with error
-            client_url += '?' + urllib.parse.urlencode({'error': 'Missing code in request'})
+            client_uri += '?' + urllib.parse.urlencode({'error': 'Missing code in request'})
             self.send_response(302)
-            self.send_header('Location', client_url)
+            self.send_header('Location', client_uri)
             self.end_headers()
             return
 
@@ -61,13 +58,13 @@ class RedirectHandler(BaseHTTPRequestHandler):
                 return
 
         # Encode the result in the redirect URL parameters
-        client_url += '?' + urllib.parse.urlencode({'payload': res})
+        client_uri += '?' + urllib.parse.urlencode({'payload': res})
         # And encode the original URL parameters as well
-        client_url += '&' + parsed_url.query
-        print(f"Redirecting to {client_url}")
+        client_uri += '&' + parsed_url.query
+        print(f"Redirecting to {client_uri}")
         # Send a 302 redirect response
         self.send_response(302)
-        self.send_header('Location', client_url)
+        self.send_header('Location', client_uri)
         self.end_headers()
 
 if __name__ == '__main__':

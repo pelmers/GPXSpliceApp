@@ -1,13 +1,13 @@
 {
   "expo": {
     "name": "GPXSpliceApp",
-    "slug": "GPXSpliceApp",
+    "slug": "gpxsplice",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "entryPoint": "./src/App.js",
-    "scheme": "gpxsplice",
+    "scheme": "com.pelmers.gpxsplice",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -15,16 +15,31 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pelmers.gpxsplice"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+      "package": "com.pelmers.gpxsplice",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "https",
+            "host": "gpxspliceredirect.pelmers.com",
+            "pathPrefix": "/"
+          },
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "50ae4f64-4602-433d-ad75-f087dc4feea9"
+      }
+    },
+    "owner": "pelmers"
   }
 }

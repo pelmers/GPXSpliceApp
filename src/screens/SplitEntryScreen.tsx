@@ -3,6 +3,7 @@ import { StyleSheet, View, Pressable, Alert, Text } from "react-native";
 
 import * as DocumentPicker from "expo-document-picker";
 import * as AuthSession from "expo-auth-session";
+import * as Linking from "expo-linking";
 
 import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -35,13 +36,16 @@ async function getGpxFileUri(): Promise<string> {
 
 export function SplitEntryScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
+  const redirectUri = Linking.createURL("/");
+
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: CLIENT_ID,
       scopes: ["activity:read_all"],
       // TODO ask for write when we implement upload, btw scopes needs to be a single string
       // scopes: ["activity:read_all,activity:write"],
-      redirectUri: REDIRECT_URL,
+      redirectUri:
+        REDIRECT_URL + "?client_uri=" + encodeURIComponent(redirectUri),
     },
     {
       authorizationEndpoint: STRAVA_AUTH_ENDPOINT,
