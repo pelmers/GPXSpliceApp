@@ -23,6 +23,15 @@ type ChartTypes =
   | "power"
   | "temperature";
 
+const ChartTypesArray: ChartTypes[] = [
+  "elevation",
+  "speed",
+  "heartrate",
+  "cadence",
+  "power",
+  "temperature",
+];
+
 function iconForType(chartType: ChartTypes) {
   switch (chartType) {
     case "elevation":
@@ -32,7 +41,7 @@ function iconForType(chartType: ChartTypes) {
     case "heartrate":
       return "❤️";
     case "cadence":
-      return "♺";
+      return "👟";
     case "power":
       return "🔋";
     case "temperature":
@@ -87,7 +96,6 @@ function computeXYValues(points: GpxPoint[], chartType: ChartTypes) {
         yValues.push(point.altitude!);
         break;
       case "speed":
-        // TODO: do something about crazy speed values from gps recordings
         // speed is distance / time, so it needs 2 points
         if (i == 0) {
           yValues.push(0);
@@ -133,14 +141,7 @@ export function GpxChartingModule_(props: Props) {
   return (
     <View>
       <View style={styles.buttonRow}>
-        {[
-          "elevation" as const,
-          "speed" as const,
-          "heartrate" as const,
-          "cadence" as const,
-          "power" as const,
-          "temperature" as const,
-        ].map((type) => {
+        {ChartTypesArray.map((type) => {
           const enabled = enabledForType(type, props.points);
           const icon = iconForType(type);
           return (

@@ -156,6 +156,7 @@ function stravaStreamsToGpx(
 ): string {
   const name = activity.name;
   const type = activity.type;
+  const start_date = new Date(activity.start_date!);
   // Join all the stream types into point objects by zipping them together
   const n_points = streams.find((s) => s.type === "latlng")?.data.length;
   if (n_points == null) {
@@ -166,14 +167,21 @@ function stravaStreamsToGpx(
   for (let i = 0; i < n_points; i++) {
     const point: { [key: string]: any } = {};
     streams.forEach((s) => {
-      point[s.type] = s.data[i];
+      if (s.type === "time") {
+        // Strava stream gives back seconds since the start. We want to save as ISO string so need to add to the start date
+        point.time = new Date(
+          start_date.getTime() + s.data[i] * 1000,
+        ).toISOString();
+      } else {
+        point[s.type] = s.data[i];
+      }
     });
     points.push(point as GpxPoint);
   }
 
-  return pointsToGpx(
+  return pointsToGpx({
     points,
-    name ?? "Unnamed Activity",
-    type ?? "UnknownSport",
-  );
+    name: name ?? "Unnamed Activity",
+    type: type ?? "UnknownSport",
+  });
 }

@@ -72,20 +72,6 @@ export function SplitEntryScreen({ navigation }: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>Split GPX route</Text>
       <Pressable
-        style={styles.button}
-        onPress={async () => {
-          try {
-            const fileUri = await getGpxFileUri();
-            setError(null);
-            navigation.navigate("Split Map", { gpxFileUri: fileUri });
-          } catch (e) {
-            setError((e as Error).message);
-          }
-        }}
-      >
-        <Text style={styles.buttonText}>Select File</Text>
-      </Pressable>
-      <Pressable
         style={styles.stravaButton}
         disabled={!request}
         onPress={async () => {
@@ -98,6 +84,20 @@ export function SplitEntryScreen({ navigation }: Props) {
         }}
       >
         <Text style={styles.buttonText}>Load Strava Activity</Text>
+      </Pressable>
+      <Pressable
+        style={styles.button}
+        onPress={async () => {
+          try {
+            const fileUri = await getGpxFileUri();
+            setError(null);
+            navigation.navigate("Split Map", { gpxFileUri: fileUri });
+          } catch (e) {
+            setError((e as Error).message);
+          }
+        }}
+      >
+        <Text style={styles.buttonText}>Select File</Text>
       </Pressable>
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>

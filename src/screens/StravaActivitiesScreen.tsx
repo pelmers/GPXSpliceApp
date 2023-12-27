@@ -6,6 +6,7 @@ import {
   Text,
   ActivityIndicator,
   ScrollView,
+  FlatList,
 } from "react-native";
 
 import * as DocumentPicker from "expo-document-picker";
@@ -55,35 +56,48 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [activities, setActivities] = useState<StravaActivity[]>([]);
 
+  const [page, setPage] = useState(1);
+  const [refreshing, setRefreshing] = useState(false);
+
   useEffect(() => {
+    loadActivities();
+  }, [accessToken, page]);
+
+  const loadActivities = async () => {
     setLoadingInline(true);
     setError(null);
-    fetchStravaActivities(accessToken)
-      .then((activities) => {
-        setActivities(activities);
-        setLoadingInline(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setError((error as Error).message);
-        setLoadingInline(false);
-      });
-  }, [accessToken]);
+    try {
+      const newActivities = await fetchStravaActivities(accessToken, page);
+      setActivities((prevActivities) => [...prevActivities, ...newActivities]);
+      setLoadingInline(false);
+    } catch (error) {
+      console.error(error);
+      setError((error as Error).message);
+      setLoadingInline(false);
+    }
+  };
 
-  // TODO: paginate when scrolling to bottom of list
-  // TODO: implement drag up to refresh
-  // TODO: look at this query library? tanstack/use-query, e.g. https://github.com/TanStack/query/discussions/1275
+  const refreshActivities = async () => {
+    setRefreshing(true);
+    setPage(1);
+    setActivities([]);
+    await loadActivities();
+    setRefreshing(false);
+  };
+
   return (
     <View style={styles.container}>
       <LoadingModal visible={loadingModal} />
       <View style={{ flexBasis: 75 }}>{displayAthlete(athlete)}</View>
       <View style={{ flexBasis: 25 }}>
-        <Text style={styles.instructionText}>Select an activity to split</Text>
+        <Text style={styles.instructionText}>Press an activity to split</Text>
       </View>
-      <ScrollView style={{ flexGrow: 1 }}>
-        {activities.map((activity, index) => (
+      <FlatList
+        style={{ flexGrow: 1 }}
+        data={activities}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item: activity }) => (
           <StravaActivityRow
-            key={index}
             activity={activity}
             onPress={async (activity) => {
               setLoadingModal(true);
@@ -98,7 +112,6 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
                 }
                 const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
                 await FileSystem.writeAsStringAsync(fileUri, gpxContents);
-                // navigate to next screen
                 navigation.navigate("Split Map", {
                   gpxFileUri: fileUri,
                   stravaAccessToken: accessToken,
@@ -111,10 +124,16 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
               }
             }}
           />
-        ))}
-        {loadingInline && <ActivityIndicator size="large" />}
-        {error && <Text style={styles.errorText}>{error}</Text>}
-      </ScrollView>
+        )}
+        onEndReached={() => setPage((prevPage) => prevPage + 1)}
+        onEndReachedThreshold={0.5}
+        refreshing={refreshing}
+        onRefresh={refreshActivities}
+      />
+      {loadingInline && (
+        <ActivityIndicator size="large" color={colors.secondary} />
+      )}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 }

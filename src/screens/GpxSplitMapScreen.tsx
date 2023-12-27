@@ -20,6 +20,7 @@ import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import {
+  GpxFile,
   GpxPoint,
   calculateCumulativeDistance,
   parseGpxFile,
@@ -31,11 +32,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Split Map">;
 // MapView usage docs: https://docs.expo.dev/versions/latest/sdk/map-view/
 
 export function GpxSplitMapScreen({ navigation, route }: Props) {
-  const [gpx, setGpx] = useState<{
-    points: GpxPoint[];
-    name: string;
-    type: string;
-  } | null>(null);
+  const [gpx, setGpx] = useState<GpxFile | null>(null);
   const [sliderValue, setSliderValue] = useState(0);
   const [distances, setDistances] = useState<number[]>([]);
 
@@ -135,9 +132,6 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
         />
         <Pressable
           onPress={() => {
-            // TODO: navigate to the post split screen, sending the split file + split index + strava token as prop
-            // TODO: the post split screen will show the 2 activities each with a summary and each has a button to save or upload to strava (which will have private/public checkbox)
-            console.log("Split button pressed");
             navigation.navigate("Post Split", {
               gpxFileUri,
               splitIndex: sliderIndex,

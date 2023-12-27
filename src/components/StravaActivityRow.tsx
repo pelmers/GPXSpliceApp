@@ -35,7 +35,7 @@ function getActivityEmoji(activity: StravaActivity) {
     case "Sail":
       return "⛵";
     default:
-      return "🤨";
+      return "👍";
   }
 }
 

@@ -12,12 +12,15 @@ export type GpxPoint = { latlng: [number, number] } & Partial<{
   time: string;
 }>;
 
+export type GpxFile = {
+  points: GpxPoint[];
+  name: string;
+  type: string;
+};
+
 // Converts a list of points into a gpx file
-export function pointsToGpx(
-  points: GpxPoint[],
-  name: string,
-  type: string,
-): string {
+export function pointsToGpx(gpx: GpxFile): string {
+  const { points, name, type } = gpx;
   return `<?xml version="1.0" encoding="UTF-8"?>
 <gpx creator="GPXSplice with Barometer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd" version="1.1" xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3">
     <metadata>
@@ -105,4 +108,40 @@ export function calculateCumulativeDistance(points: GpxPoint[]): number[] {
   }
 
   return cumulativeDistances;
+}
+
+export function gpxSummaryStats(points: GpxPoint[]): {
+  distance: number;
+  duration: number | null;
+  averageSpeed: number | null;
+  averageHeartRate: number | null;
+  averageCadence: number | null;
+  averagePower: number | null;
+} {
+  const cumulativeDistances = calculateCumulativeDistance(points);
+
+  const distance = cumulativeDistances[cumulativeDistances.length - 1];
+  const duration = points[points.length - 1].time
+    ? new Date(points[points.length - 1].time!).getTime() -
+      new Date(points[0].time!).getTime()
+    : null;
+
+  const averageSpeed = duration ? (distance * 3600 * 1000) / duration : null;
+  const averageHeartRate =
+    points.reduce((sum, point) => sum + (point.heartrate ?? 0), 0) /
+    points.length;
+  const averageCadence =
+    points.reduce((sum, point) => sum + (point.cadence ?? 0), 0) /
+    points.length;
+  const averagePower =
+    points.reduce((sum, point) => sum + (point.watts ?? 0), 0) / points.length;
+
+  return {
+    distance,
+    duration,
+    averageSpeed,
+    averageHeartRate: averageHeartRate ? Math.round(averageHeartRate) : null,
+    averageCadence: averageCadence ? Math.round(averageCadence) : null,
+    averagePower: averagePower ? Math.round(averagePower) : null,
+  };
 }
