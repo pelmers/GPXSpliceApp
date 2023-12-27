@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "comments": [
+    {
+      "commentRange": {
+        "start": {
+          "line": 212,
+          "char": 0
+        },
+        "end": {
+          "line": 212,
+          "char": 82
+        }
+      },
+      "codeRange": {
+        "start": {
+          "line": 213,
+          "char": 0
+        },
+        "end": {
+          "line": 224,
+          "char": 10
+        }
+      },
+      "codeRelativePath": "",
+      "commentValue": "          // 64 and 32 are the margins of the chart axes, determined by inspection",
+      "codeValue": "          <View\n            style={{\n              position: \"absolute\",\n              left: 64 + (props.chartWidth - 64) * splitPercent,\n              top: 16,\n              bottom: 32,\n              width: 2,\n              opacity: 0.7,\n              backgroundColor: colors.primary,\n            }}\n          />\n        )}",
+      "id": 0
+    }
+  ],
+  "configuration": {
+    "lineComment": "//"
+  }
+}
