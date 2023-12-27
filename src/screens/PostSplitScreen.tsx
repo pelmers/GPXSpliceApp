@@ -59,6 +59,10 @@ export function PostSplitScreen({ navigation, route }: Props) {
           type: parsedGpx.type,
           points: parsedGpx.points.slice(splitIndex),
         };
+        // If the splitIndex was 0 or max, then throw an error
+        if (file1.points.length === 0 || file2.points.length === 0) {
+          throw new Error("Split index cannot be 0 or max");
+        }
         setGpxFiles([file1, file2]);
       } catch (e) {
         console.error(e);
@@ -70,7 +74,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
     splitGpxFile();
   }, [gpxFileUri, splitIndex]);
 
-  if (loading || !gpxFiles) {
+  if (loading && !gpxFiles) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color={colors.secondary} />
@@ -81,65 +85,66 @@ export function PostSplitScreen({ navigation, route }: Props) {
   // For each file, show a summary of stats + a charting module + 2 buttons (share, upload)
   return (
     <ScrollView>
-      {gpxFiles.map((file, index) => {
-        const stats = gpxSummaryStats(file.points);
-        return (
-          <View key={index}>
-            <View style={styles.activityFragmentContainer}>
-              <ActivityInfoFragment
-                stats={stats}
-                name={file.name}
-                isPrivate={false}
-                activityType={file.type}
+      {gpxFiles &&
+        gpxFiles.map((file, index) => {
+          const stats = gpxSummaryStats(file.points);
+          return (
+            <View key={index}>
+              <View style={styles.activityFragmentContainer}>
+                <ActivityInfoFragment
+                  stats={stats}
+                  name={file.name}
+                  isPrivate={false}
+                  activityType={file.type}
+                />
+              </View>
+              <GpxChartingModule
+                points={file.points}
+                chartWidth={Dimensions.get("screen").width - 4}
+                chartHeight={180}
               />
-            </View>
-            <GpxChartingModule
-              points={file.points}
-              chartWidth={Dimensions.get("screen").width - 4}
-              chartHeight={180}
-            />
-            <View style={styles.actionButtonsContainer}>
-              <Pressable
-                style={styles.shareButton}
-                onPress={async () => {
-                  try {
-                    const path = await writeFile(file);
-                    await Sharing.shareAsync(path, {
-                      mimeType: "application/gpx+xml",
-                      dialogTitle: "Share GPX File",
-                      UTI: "com.topografix.gpx",
-                    });
-                  } catch (e) {
-                    console.error(e);
-                    setError((e as Error).message);
-                  }
-                }}
-              >
-                <Text style={styles.buttonText}>🔗 Share</Text>
-              </Pressable>
+              <View style={styles.actionButtonsContainer}>
+                <Pressable
+                  style={styles.shareButton}
+                  onPress={async () => {
+                    try {
+                      const path = await writeFile(file);
+                      await Sharing.shareAsync(path, {
+                        mimeType: "application/gpx+xml",
+                        dialogTitle: "Share GPX File",
+                        UTI: "com.topografix.gpx",
+                      });
+                    } catch (e) {
+                      console.error(e);
+                      setError((e as Error).message);
+                    }
+                  }}
+                >
+                  <Text style={styles.buttonText}>🔗 Share</Text>
+                </Pressable>
 
-              <Pressable
-                style={styles.uploadButton}
-                onPress={() => {
-                  // TODO: Implement upload functionality
-                  console.log(`Uploading ${file.name}`);
-                  Alert.alert("Not implemented yet");
+                <Pressable
+                  style={styles.uploadButton}
+                  onPress={() => {
+                    // TODO: Implement upload functionality
+                    console.log(`Uploading ${file.name}`);
+                    Alert.alert("Not implemented yet");
+                  }}
+                >
+                  <Text style={styles.buttonText}>⬆️ Upload</Text>
+                </Pressable>
+              </View>
+              <View
+                style={{
+                  borderBottomColor: colors.light,
+                  borderBottomWidth: 1,
+                  opacity: 0.2,
+                  marginHorizontal: 100,
                 }}
-              >
-                <Text style={styles.buttonText}>⬆️ Upload</Text>
-              </Pressable>
+              ></View>
             </View>
-            <View
-              style={{
-                borderBottomColor: colors.light,
-                borderBottomWidth: 1,
-                opacity: 0.2,
-                marginHorizontal: 100,
-              }}
-            ></View>
-          </View>
-        );
-      })}
+          );
+        })}
       {error && <Text>{error}</Text>}
     </ScrollView>
   );

@@ -56,6 +56,7 @@ export function HomeScreen({ navigation }: Props) {
       <View style={styles.buttonBackground}>
         <Pressable
           onPress={() => {
+            // TODO implement combine feature
             Alert.alert("combine");
           }}
           style={styles.button}

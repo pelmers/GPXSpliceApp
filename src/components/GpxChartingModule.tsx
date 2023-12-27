@@ -192,6 +192,11 @@ export function GpxChartingModule(props: Props) {
           props.splitData.index,
         )
       : null;
+  const yUnits = yAxisUnitsForType(chartType);
+  const splitLabel =
+    props.splitData != null
+      ? `${yValues[props.splitData.index].toFixed(1)} ${yUnits}`
+      : null;
   // A row of buttons with icons, then a chart below and a split marker that follows the slider if given
   return (
     <View>
@@ -204,7 +209,7 @@ export function GpxChartingModule(props: Props) {
         <EasyLineChart
           xValues={xValues}
           yValues={yValues}
-          yAxisUnits={yAxisUnitsForType(chartType)}
+          yAxisUnits={yUnits}
           maxPoints={100}
           width={props.chartWidth}
           height={props.chartHeight}
@@ -221,7 +226,15 @@ export function GpxChartingModule(props: Props) {
               opacity: 0.7,
               backgroundColor: colors.primary,
             }}
-          />
+          >
+            <View
+              style={{ position: "absolute", top: -20, left: -50, width: 100 }}
+            >
+              <Text style={{ color: "white", textAlign: "center" }}>
+                {splitLabel}
+              </Text>
+            </View>
+          </View>
         )}
       </View>
     </View>

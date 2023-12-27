@@ -94,7 +94,6 @@ function EasyLineChart_(props: Props) {
         marginVertical: 8,
         borderRadius: 8,
       }}
-      // decorator={(args) => { console.log(args.width, args.paddingTop, args.paddingRight) }}
     />
   );
 }
