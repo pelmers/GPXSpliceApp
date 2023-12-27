@@ -13,9 +13,13 @@ type Props = {
   points: GpxPoint[];
   chartHeight: number;
   chartWidth: number;
+  splitData?: {
+    index: number;
+    cumulativeDistances: number[];
+  };
 };
 
-type ChartTypes =
+type ChartType =
   | "elevation"
   | "speed"
   | "heartrate"
@@ -23,7 +27,7 @@ type ChartTypes =
   | "power"
   | "temperature";
 
-const ChartTypesArray: ChartTypes[] = [
+const ChartTypesArray: ChartType[] = [
   "elevation",
   "speed",
   "heartrate",
@@ -32,7 +36,7 @@ const ChartTypesArray: ChartTypes[] = [
   "temperature",
 ];
 
-function iconForType(chartType: ChartTypes) {
+function iconForType(chartType: ChartType) {
   switch (chartType) {
     case "elevation":
       return "🏔";
@@ -49,24 +53,24 @@ function iconForType(chartType: ChartTypes) {
   }
 }
 
-function enabledForType(chartType: ChartTypes, points: GpxPoint[]) {
+function enabledForType(chartType: ChartType, points: GpxPoint[]) {
   switch (chartType) {
     case "heartrate":
-      return !points.some((point) => point.heartrate == null);
+      return points.some((point) => point.heartrate != null);
     case "cadence":
-      return !points.some((point) => point.cadence == null);
+      return points.some((point) => point.cadence != null);
     case "power":
-      return !points.some((point) => point.watts == null);
+      return points.some((point) => point.watts != null);
     case "temperature":
-      return !points.some((point) => point.temp == null);
+      return points.some((point) => point.temp != null);
     case "elevation":
-      return !points.some((point) => point.altitude == null);
+      return points.some((point) => point.altitude != null);
     case "speed":
-      return !points.some((point) => point.time == null);
+      return points.some((point) => point.time != null);
   }
 }
 
-function yAxisUnitsForType(chartType: ChartTypes) {
+function yAxisUnitsForType(chartType: ChartType) {
   switch (chartType) {
     case "elevation":
       return "m";
@@ -83,7 +87,7 @@ function yAxisUnitsForType(chartType: ChartTypes) {
   }
 }
 
-function computeXYValues(points: GpxPoint[], chartType: ChartTypes) {
+function computeXYValues(points: GpxPoint[], chartType: ChartType) {
   if (!enabledForType(chartType, points)) {
     throw new Error("Chart type not enabled for this data");
   }
@@ -93,7 +97,7 @@ function computeXYValues(points: GpxPoint[], chartType: ChartTypes) {
     const point = points[i];
     switch (chartType) {
       case "elevation":
-        yValues.push(point.altitude!);
+        yValues.push(point.altitude ?? 0);
         break;
       case "speed":
         // speed is distance / time, so it needs 2 points
@@ -114,55 +118,88 @@ function computeXYValues(points: GpxPoint[], chartType: ChartTypes) {
         }
         break;
       case "heartrate":
-        yValues.push(point.heartrate!);
+        yValues.push(point.heartrate ?? 0);
         break;
       case "cadence":
-        yValues.push(point.cadence!);
+        yValues.push(point.cadence ?? 0);
         break;
       case "power":
-        yValues.push(point.watts!);
+        yValues.push(point.watts ?? 0);
         break;
       case "temperature":
-        yValues.push(point.temp!);
+        yValues.push(point.temp ?? 0);
         break;
     }
   }
   return { xValues, yValues };
 }
 
-export function GpxChartingModule_(props: Props) {
-  const [chartType, setChartType] = useState<ChartTypes>("elevation");
+function ChartButtonRow(props: {
+  currentType: ChartType;
+  points: GpxPoint[];
+  onPress: (chartType: ChartType) => void;
+}) {
+  return (
+    <View style={styles.buttonRow}>
+      {ChartTypesArray.map((type) => {
+        const enabled = enabledForType(type, props.points);
+        const icon = iconForType(type);
+        return (
+          <Pressable
+            key={type}
+            onPress={() => props.onPress(type)}
+            style={[
+              styles.button,
+              props.currentType === type
+                ? styles.currentButton
+                : enabled
+                  ? styles.enabledButton
+                  : styles.disabledButton,
+            ]}
+            disabled={!enabled}
+          >
+            <Text style={styles.buttonText}>{icon}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+// The split slider units are indices, but the chart is in distance on the x axis.
+// So we want to get the distance of the split point, and then find the index of the point closest to that distance
+// Return the proportion of the total distance that the split point is at
+function computeSplitPercent(
+  cumulativeDistances: number[],
+  splitIndex: number,
+) {
+  const totalDistance = cumulativeDistances[cumulativeDistances.length - 1];
+  const splitDistance = cumulativeDistances[splitIndex];
+  return splitDistance / totalDistance;
+}
+
+export function GpxChartingModule(props: Props) {
+  const [chartType, setChartType] = useState<ChartType>("elevation");
   const { xValues, yValues } = useMemo(
     () => computeXYValues(props.points, chartType),
     [props.points, chartType],
   );
 
-  // A row of buttons with icons, then a chart below
+  const splitPercent =
+    props.splitData != null
+      ? computeSplitPercent(
+          props.splitData.cumulativeDistances,
+          props.splitData.index,
+        )
+      : null;
+  // A row of buttons with icons, then a chart below and a split marker that follows the slider if given
   return (
     <View>
-      <View style={styles.buttonRow}>
-        {ChartTypesArray.map((type) => {
-          const enabled = enabledForType(type, props.points);
-          const icon = iconForType(type);
-          return (
-            <Pressable
-              key={type}
-              onPress={() => setChartType(type)}
-              style={[
-                styles.button,
-                chartType === type
-                  ? styles.currentButton
-                  : enabled
-                    ? styles.enabledButton
-                    : styles.disabledButton,
-              ]}
-              disabled={!enabled}
-            >
-              <Text style={styles.buttonText}>{icon}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      <ChartButtonRow
+        currentType={chartType}
+        points={props.points}
+        onPress={setChartType}
+      />
       <View style={styles.chartContainer}>
         <EasyLineChart
           xValues={xValues}
@@ -172,6 +209,20 @@ export function GpxChartingModule_(props: Props) {
           width={props.chartWidth}
           height={props.chartHeight}
         />
+        {splitPercent != null && (
+          // 64 and 32 are the margins of the chart axes, determined by inspection
+          <View
+            style={{
+              position: "absolute",
+              left: 64 + (props.chartWidth - 64) * splitPercent,
+              top: 16,
+              bottom: 32,
+              width: 2,
+              opacity: 0.7,
+              backgroundColor: colors.primary,
+            }}
+          />
+        )}
       </View>
     </View>
   );
@@ -209,5 +260,3 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
-
-export const GpxChartingModule = React.memo(GpxChartingModule_);

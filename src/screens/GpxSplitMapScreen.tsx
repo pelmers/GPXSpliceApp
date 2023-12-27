@@ -63,6 +63,13 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
   );
   const splitMarkerValue =
     distances.length > 0 ? `${distances[sliderIndex].toFixed(1)} km` : "";
+  const splitData =
+    distances.length > 0
+      ? {
+          index: sliderIndex,
+          cumulativeDistances: distances,
+        }
+      : undefined;
 
   // TODO: set up a units layer so that the user can choose between miles and km
   return (
@@ -144,11 +151,11 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
         </Pressable>
       </View>
       <View style={styles.chartContainer}>
-        {/* TODO: add a vertical line in the chart to show the split point */}
         <GpxChartingModule
           points={gpx.points}
           chartWidth={Dimensions.get("window").width - 4}
           chartHeight={200}
+          splitData={splitData}
         />
       </View>
     </View>

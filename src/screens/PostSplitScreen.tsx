@@ -5,10 +5,9 @@ import {
   StyleSheet,
   View,
   Text,
-  Button,
   ActivityIndicator,
   Dimensions,
-  Share,
+  Pressable,
   Alert,
   ScrollView,
 } from "react-native";
@@ -24,15 +23,18 @@ import {
   pointsToGpx,
 } from "../utils/gpx";
 import { GpxChartingModule } from "../components/GpxChartingModule";
-import humanizeDuration from "humanize-duration";
-
-// TODO this screen will receive the gpx file path, split index, and optional strava token as props
-// TODO load the file, do the split, and show stats for the two activities
-// TODO stats include distance, avg speed, time, elevation gain
-// TODO ideally also show graphs for each one
-// TODO then a "share" button on each one to export to file or upload to strava directly
+import { ActivityInfoFragment } from "../components/ActivityInfoFragment";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Post Split">;
+
+async function writeFile(file: GpxFile): Promise<string> {
+  const serializedGpxFileString = pointsToGpx(file);
+  const path = `${FileSystem.documentDirectory}${encodeURIComponent(
+    file.name,
+  )}.gpx`;
+  await FileSystem.writeAsStringAsync(path, serializedGpxFileString);
+  return path;
+}
 
 export function PostSplitScreen({ navigation, route }: Props) {
   const { gpxFileUri, splitIndex, stravaAccessToken } = route.params;
@@ -83,60 +85,58 @@ export function PostSplitScreen({ navigation, route }: Props) {
         const stats = gpxSummaryStats(file.points);
         return (
           <View key={index}>
-            <Text>{file.name}</Text>
-            <Text>{`Total distance: ${stats.distance} km`}</Text>
-            {stats.duration && (
-              <Text>{`Total time: ${humanizeDuration(stats.duration)}`}</Text>
-            )}
-            {stats.averageSpeed && (
-              <Text>{`Avg. speed: ${stats.averageSpeed} kph`}</Text>
-            )}
-            {stats.averageHeartRate && (
-              <Text>{`Avg. heart rate: ${stats.averageHeartRate}`}</Text>
-            )}
-            {stats.averageCadence && (
-              <Text>{`Avg. cadence: ${stats.averageCadence}`}</Text>
-            )}
-            {stats.averagePower && (
-              <Text>{`Avg. power: ${stats.averagePower}`}</Text>
-            )}
+            <View style={styles.activityFragmentContainer}>
+              <ActivityInfoFragment
+                stats={stats}
+                name={file.name}
+                isPrivate={false}
+                activityType={file.type}
+              />
+            </View>
             <GpxChartingModule
               points={file.points}
-              chartWidth={Dimensions.get("screen").width}
+              chartWidth={Dimensions.get("screen").width - 4}
               chartHeight={180}
             />
-            <Button
-              title="Share"
-              onPress={async () => {
-                try {
-                  const serializedGpxFileString = pointsToGpx(file);
-                  const path = `${
-                    FileSystem.documentDirectory
-                  }${encodeURIComponent(file.name)}.gpx`;
-                  await FileSystem.writeAsStringAsync(
-                    path,
-                    serializedGpxFileString,
-                  );
-                  console.log(`Sharing ${path}`);
-                  await Sharing.shareAsync(path, {
-                    mimeType: "application/gpx+xml",
-                    dialogTitle: "Share GPX File",
-                    UTI: "com.topografix.gpx",
-                  });
-                } catch (e) {
-                  console.error(e);
-                  setError((e as Error).message);
-                }
+            <View style={styles.actionButtonsContainer}>
+              <Pressable
+                style={styles.shareButton}
+                onPress={async () => {
+                  try {
+                    const path = await writeFile(file);
+                    await Sharing.shareAsync(path, {
+                      mimeType: "application/gpx+xml",
+                      dialogTitle: "Share GPX File",
+                      UTI: "com.topografix.gpx",
+                    });
+                  } catch (e) {
+                    console.error(e);
+                    setError((e as Error).message);
+                  }
+                }}
+              >
+                <Text style={styles.buttonText}>🔗 Share</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.uploadButton}
+                onPress={() => {
+                  // TODO: Implement upload functionality
+                  console.log(`Uploading ${file.name}`);
+                  Alert.alert("Not implemented yet");
+                }}
+              >
+                <Text style={styles.buttonText}>⬆️ Upload</Text>
+              </Pressable>
+            </View>
+            <View
+              style={{
+                borderBottomColor: colors.light,
+                borderBottomWidth: 1,
+                opacity: 0.2,
+                marginHorizontal: 100,
               }}
-            />
-            <Button
-              title="Upload"
-              onPress={() => {
-                // TODO: Implement upload functionality
-                console.log(`Uploading ${file.name}`);
-                Alert.alert("Not implemented yet");
-              }}
-            />
+            ></View>
           </View>
         );
       })}
@@ -151,5 +151,38 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
     alignItems: "center",
     justifyContent: "center",
+  },
+  activityFragmentContainer: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    marginBottom: 5,
+    paddingHorizontal: 15,
+  },
+  actionButtonsContainer: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  shareButton: {
+    backgroundColor: colors.accent,
+    padding: 10,
+    marginBottom: 10,
+    marginRight: 25,
+    borderRadius: 5,
+  },
+  uploadButton: {
+    backgroundColor: colors.strava,
+    padding: 10,
+    marginBottom: 10,
+    marginLeft: 25,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
   },
 });

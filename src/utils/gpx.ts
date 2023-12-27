@@ -18,6 +18,17 @@ export type GpxFile = {
   type: string;
 };
 
+export type GpxSummary = {
+  distance: number;
+} & Partial<{
+  startTime: string | null;
+  durationMs: number | null;
+  averageSpeed: number | null;
+  averageHeartRate: number | null;
+  averageCadence: number | null;
+  averagePower: number | null;
+}>;
+
 // Converts a list of points into a gpx file
 export function pointsToGpx(gpx: GpxFile): string {
   const { points, name, type } = gpx;
@@ -110,14 +121,7 @@ export function calculateCumulativeDistance(points: GpxPoint[]): number[] {
   return cumulativeDistances;
 }
 
-export function gpxSummaryStats(points: GpxPoint[]): {
-  distance: number;
-  duration: number | null;
-  averageSpeed: number | null;
-  averageHeartRate: number | null;
-  averageCadence: number | null;
-  averagePower: number | null;
-} {
+export function gpxSummaryStats(points: GpxPoint[]): GpxSummary {
   const cumulativeDistances = calculateCumulativeDistance(points);
 
   const distance = cumulativeDistances[cumulativeDistances.length - 1];
@@ -125,6 +129,7 @@ export function gpxSummaryStats(points: GpxPoint[]): {
     ? new Date(points[points.length - 1].time!).getTime() -
       new Date(points[0].time!).getTime()
     : null;
+  const startTime = points[0].time ?? null;
 
   const averageSpeed = duration ? (distance * 3600 * 1000) / duration : null;
   const averageHeartRate =
@@ -137,8 +142,9 @@ export function gpxSummaryStats(points: GpxPoint[]): {
     points.reduce((sum, point) => sum + (point.watts ?? 0), 0) / points.length;
 
   return {
+    startTime,
     distance,
-    duration,
+    durationMs: duration,
     averageSpeed,
     averageHeartRate: averageHeartRate ? Math.round(averageHeartRate) : null,
     averageCadence: averageCadence ? Math.round(averageCadence) : null,
