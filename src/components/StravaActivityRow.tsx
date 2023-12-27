@@ -8,11 +8,12 @@ import { ActivityInfoFragment } from "./ActivityInfoFragment";
 
 type Props = {
   activity: StravaActivity;
+  selected?: boolean;
   onPress: (activity: StravaActivity) => void;
 };
 
 export function StravaActivityRow(props: Props) {
-  const { activity } = props;
+  const { activity, selected } = props;
   const hasGps =
     activity.map != null &&
     activity.map.summary_polyline != null &&
@@ -20,11 +21,11 @@ export function StravaActivityRow(props: Props) {
   return (
     <View>
       <Pressable
-        style={
-          hasGps
-            ? styles.activityInfoContainer
-            : styles.disabledActivityInfoContainer
-        }
+        style={[
+          styles.activityInfoContainer,
+          selected ? { backgroundColor: colors.light + "88" } : {},
+          !hasGps ? { opacity: 0.6 } : {},
+        ]}
         onPress={() => props.onPress(activity)}
         disabled={!hasGps}
       >
@@ -64,14 +65,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 5,
     paddingHorizontal: 15,
-  },
-  disabledActivityInfoContainer: {
-    flex: 1,
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    marginBottom: 5,
-    paddingHorizontal: 15,
-    opacity: 0.6,
   },
 });

@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   ScrollView,
   FlatList,
+  Pressable,
 } from "react-native";
 
 import * as DocumentPicker from "expo-document-picker";
@@ -25,7 +26,7 @@ import {
 import { StravaActivityRow } from "../components/StravaActivityRow";
 import { LoadingModal } from "../components/LoadingModal";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Strava List">;
+type Props = NativeStackScreenProps<RootStackParamList, "Combine (Strava)">;
 
 function displayAthlete(athlete: StravaAthlete) {
   // Render a banner that shows information about the logged in athlete
@@ -49,12 +50,15 @@ function displayAthlete(athlete: StravaAthlete) {
   );
 }
 
-export function StravaActivitiesScreen({ navigation, route }: Props) {
-  const { accessToken, mode, athlete } = route.params;
+export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
+  const { accessToken, athlete } = route.params;
   const [loadingInline, setLoadingInline] = useState(false);
   const [loadingModal, setLoadingModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activities, setActivities] = useState<StravaActivity[]>([]);
+  const [selectedActivities, setSelectedActivities] = useState<
+    StravaActivity[]
+  >([]);
 
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
@@ -85,12 +89,47 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
     setRefreshing(false);
   };
 
+  const fetchAllSelectedActivities = async () => {
+    setLoadingModal(true);
+    setError(null);
+    try {
+      const gpxFileUris = await Promise.all(
+        selectedActivities.map(async (activity) => {
+          const gpxContents = await fetchStravaActivityGpx(
+            activity,
+            accessToken,
+          );
+          if (FileSystem.cacheDirectory == null) {
+            throw new Error("FileSystem.cacheDirectory is null");
+          }
+          const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
+          await FileSystem.writeAsStringAsync(fileUri, gpxContents);
+          return fileUri;
+        }),
+      );
+      navigation.navigate("Combine Preview", {
+        gpxFileUris,
+        stravaAccessToken: accessToken,
+      });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoadingModal(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <LoadingModal visible={loadingModal} />
       <View style={{ flexBasis: 75 }}>{displayAthlete(athlete)}</View>
       <View style={{ flexBasis: 25 }}>
-        <Text style={styles.instructionText}>Press an activity to split</Text>
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        {!error && (
+          <Text style={styles.instructionText}>Select multiple activities to combine</Text>
+        )}
+        {loadingInline && (
+          <ActivityIndicator size="large" color={colors.secondary} />
+        )}
       </View>
       <FlatList
         style={{ flexGrow: 1 }}
@@ -99,28 +138,20 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
         renderItem={({ item: activity }) => (
           <StravaActivityRow
             activity={activity}
-            onPress={async (activity) => {
-              setLoadingModal(true);
-              setError(null);
-              try {
-                const gpxContents = await fetchStravaActivityGpx(
-                  activity,
-                  accessToken,
+            selected={selectedActivities.includes(activity)}
+            onPress={(activity) => {
+              // Append to selected list, or remove if already selected
+              if (selectedActivities.includes(activity)) {
+                setSelectedActivities((prevActivities) =>
+                  prevActivities.filter(
+                    (prevActivity) => prevActivity !== activity,
+                  ),
                 );
-                if (FileSystem.cacheDirectory == null) {
-                  throw new Error("FileSystem.cacheDirectory is null");
-                }
-                const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
-                await FileSystem.writeAsStringAsync(fileUri, gpxContents);
-                navigation.navigate("Split Map", {
-                  gpxFileUri: fileUri,
-                  stravaAccessToken: accessToken,
-                });
-              } catch (e) {
-                setError((e as Error).message);
-                console.error(e);
-              } finally {
-                setLoadingModal(false);
+              } else {
+                setSelectedActivities((prevActivities) => [
+                  ...prevActivities,
+                  activity,
+                ]);
               }
             }}
           />
@@ -130,10 +161,14 @@ export function StravaActivitiesScreen({ navigation, route }: Props) {
         refreshing={refreshing}
         onRefresh={refreshActivities}
       />
-      {loadingInline && (
-        <ActivityIndicator size="large" color={colors.secondary} />
+      {selectedActivities.length >= 2 && (
+        <Pressable
+          style={styles.combineButton}
+          onPress={fetchAllSelectedActivities}
+        >
+          <Text style={styles.combineButtonText}>COMBINE</Text>
+        </Pressable>
       )}
-      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 }
@@ -166,6 +201,24 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
-    marginTop: 10,
+    fontSize: 15,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  combineButton: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 50,
+    backgroundColor: colors.primary, // replace with your preferred color
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  combineButtonText: {
+    color: "white",
+    fontFamily: "BebasNeue-Regular",
+    fontSize: 36,
+    fontWeight: "bold",
   },
 });

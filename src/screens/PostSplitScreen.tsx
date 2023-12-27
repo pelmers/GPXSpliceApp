@@ -105,7 +105,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
               />
               <View style={styles.actionButtonsContainer}>
                 <Pressable
-                  style={styles.shareButton}
+                  style={styles.exportButton}
                   onPress={async () => {
                     try {
                       const path = await writeFile(file);
@@ -120,10 +120,10 @@ export function PostSplitScreen({ navigation, route }: Props) {
                     }
                   }}
                 >
-                  <Text style={styles.buttonText}>🔗 Share</Text>
+                  <Text style={styles.buttonText}>💾 Export</Text>
                 </Pressable>
 
-                <Pressable
+                {/* <Pressable
                   style={styles.uploadButton}
                   onPress={() => {
                     // TODO: Implement upload functionality
@@ -132,7 +132,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
                   }}
                 >
                   <Text style={styles.buttonText}>⬆️ Upload</Text>
-                </Pressable>
+                </Pressable> */}
               </View>
               <View
                 style={{
@@ -172,11 +172,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  shareButton: {
+  exportButton: {
     backgroundColor: colors.accent,
     padding: 10,
     marginBottom: 10,
-    marginRight: 25,
+    // marginRight: 25,
     borderRadius: 5,
   },
   uploadButton: {

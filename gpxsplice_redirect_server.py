@@ -27,7 +27,7 @@ class RedirectHandler(BaseHTTPRequestHandler):
             # NOTE: during development use the "exp" scheme for the Expo Go app
             client_url = f"exp://{parsed_url.path}"
         else:
-            # TODO
+            # TODO web-specific URL path
             client_url = f"https://future-domain-name-for-this-app/{parsed_url.path}"
 
         # Perform key exchange with the Strava API by sending the code with client id and secret

@@ -3,9 +3,17 @@ import { StravaAthlete } from "./types/strava";
 export type RootStackParamList = {
   Home: undefined;
   Split: undefined;
-  "Strava List": {
+  Combine: undefined;
+  "Combine Preview": {
+    gpxFileUris: string[];
+    stravaAccessToken?: string;
+  };
+  "Combine (Strava)": {
     accessToken: string;
-    mode: "split" | "combine";
+    athlete: StravaAthlete;
+  };
+  "Split (Strava)": {
+    accessToken: string;
     athlete: StravaAthlete;
   };
   "Split Map": {

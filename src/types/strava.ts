@@ -145,8 +145,11 @@ export async function fetchStravaActivityGpx(
       },
     },
   );
-  // just log the result for now
-  const streams = (await response.json()) as StravaStream[];
+  const parsedResponse = await response.json();
+  if (parsedResponse.errors != null) {
+    throw new Error(`${parsedResponse.message}, try logging in again`);
+  }
+  const streams = parsedResponse as StravaStream[];
   return stravaStreamsToGpx(activity, streams);
 }
 

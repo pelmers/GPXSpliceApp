@@ -9,31 +9,34 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import { STRAVA_AUTH_ENDPOINT, CLIENT_ID, REDIRECT_URL } from "../utils/client";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Split">;
+type Props = NativeStackScreenProps<RootStackParamList, "Combine">;
 
-async function getGpxFileUri(): Promise<string> {
+async function getGpxFileUris(): Promise<string[]> {
   const result = await DocumentPicker.getDocumentAsync({
     // type: "application/gpx+xml", // TODO: want to only allow .gpx files, this doesn't work!
     copyToCacheDirectory: true, // Optional: Set to true if you want to copy the file to the app's cache directory
-    multiple: false, // Only allow a single file
+    multiple: true, // Only allow a single file
   });
 
   if (result.assets != null) {
-    const resultFile = result.assets[0];
-    // The file was successfully picked
-    // if extension is not gpx, throw an error
-    if (resultFile.uri.endsWith(".gpx")) {
-      return resultFile.uri;
-    } else {
-      throw new Error("Selected file extension is not .gpx");
+    const uris = result.assets.map((file) => {
+      if (!file.uri.endsWith(".gpx")) {
+        throw new Error("All selected files must be .gpx files");
+      }
+      return file.uri;
+    });
+
+    if (uris.length < 2) {
+      throw new Error("Please select at least 2 .gpx files");
     }
+    return uris;
   } else {
     // The user cancelled the file picker
     throw new Error("File selection cancelled");
   }
 }
 
-export function SplitEntryScreen({ navigation }: Props) {
+export function CombineEntryScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
@@ -61,7 +64,7 @@ export function SplitEntryScreen({ navigation }: Props) {
         //   "Without write permission, I cannot help you upload activities after splitting!",
         // );
       }
-      navigation.navigate("Split (Strava)", {
+      navigation.navigate("Combine (Strava)", {
         accessToken,
         athlete: payload.athlete,
       });
@@ -70,7 +73,7 @@ export function SplitEntryScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Split GPX route</Text>
+      <Text style={styles.title}>Combine GPX routes</Text>
       <Pressable
         style={styles.stravaButton}
         disabled={!request}
@@ -89,9 +92,9 @@ export function SplitEntryScreen({ navigation }: Props) {
         style={styles.button}
         onPress={async () => {
           try {
-            const fileUri = await getGpxFileUri();
+            const gpxFileUris = await getGpxFileUris();
             setError(null);
-            navigation.navigate("Split Map", { gpxFileUri: fileUri });
+            navigation.navigate("Combine Preview", { gpxFileUris });
           } catch (e) {
             setError((e as Error).message);
           }
