@@ -1,31 +1,16 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  Text,
-  ActivityIndicator,
-  Dimensions,
-} from "react-native";
-import Slider from "@react-native-community/slider";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 
 import * as FileSystem from "expo-file-system";
 
 // For web, consider @teovilla/react-native-web-maps
 // e.g. https://stackoverflow.com/a/76702937/2288934
-import MapView from "react-native-maps";
-import { Polyline, Marker } from "react-native-maps";
 
 import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
-import {
-  GpxFile,
-  GpxPoint,
-  calculateCumulativeDistance,
-  parseGpxFile,
-} from "../utils/gpx";
-import { GpxChartingModule } from "../components/GpxChartingModule";
+import { GpxFile, parseGpxFile } from "../utils/gpx";
+import { UnifiedGpxMapView } from "../components/UnifiedGpxMapView";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Split Map">;
 
@@ -33,8 +18,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Split Map">;
 
 export function GpxSplitMapScreen({ navigation, route }: Props) {
   const [gpx, setGpx] = useState<GpxFile | null>(null);
-  const [sliderValue, setSliderValue] = useState(0);
-  const [distances, setDistances] = useState<number[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const { gpxFileUri, stravaAccessToken } = route.params;
   // Read the gpx file on mount
@@ -43,10 +27,20 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
       const fileContents = await FileSystem.readAsStringAsync(gpxFileUri);
       const parsedGpx = parseGpxFile(fileContents);
       setGpx(parsedGpx);
-      setDistances(calculateCumulativeDistance(parsedGpx.points));
     }
-    readGpxFile();
+    readGpxFile().catch((e) => {
+      setError(e.message);
+    });
   }, [gpxFileUri]);
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.titleText}>Error!</Text>
+        <Text style={[styles.titleText, { color: "red" }]}>{error}</Text>
+      </View>
+    );
+  }
 
   if (!gpx) {
     return (
@@ -56,104 +50,20 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
       </View>
     );
   }
-  const titleText = `${gpx.name} (${gpx.type})`;
-  const sliderIndex = Math.min(
-    Math.floor(sliderValue * gpx.points.length),
-    gpx.points.length - 1,
-  );
-  const splitMarkerValue =
-    distances.length > 0 ? `${distances[sliderIndex].toFixed(1)} km` : "";
-  const splitData =
-    distances.length > 0
-      ? {
-          index: sliderIndex,
-          cumulativeDistances: distances,
-        }
-      : undefined;
 
-  // TODO: set up a units layer so that the user can choose between miles and km
   return (
-    <View style={styles.container}>
-      <Text style={styles.titleText}>{titleText}</Text>
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: gpx.points[0].latlng[0],
-          longitude: gpx.points[0].latlng[1],
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1,
-        }}
-      >
-        <Marker
-          coordinate={{
-            latitude: gpx.points[0].latlng[0],
-            longitude: gpx.points[0].latlng[1],
-          }}
-          title="Start"
-          description="This is the start point"
-        >
-          <Text style={styles.markerText}>🟢</Text>
-        </Marker>
-        <Marker
-          coordinate={{
-            latitude: gpx.points[gpx.points.length - 1].latlng[0],
-            longitude: gpx.points[gpx.points.length - 1].latlng[1],
-          }}
-          title="End"
-          description="This is the end point"
-        >
-          <Text style={styles.markerText}>🏁</Text>
-        </Marker>
-        <Marker
-          coordinate={{
-            latitude: gpx.points[sliderIndex].latlng[0],
-            longitude: gpx.points[sliderIndex].latlng[1],
-          }}
-          title="Split"
-          description="This is the split point"
-        >
-          <Text style={styles.markerText}>✂️</Text>
-        </Marker>
-        <Polyline
-          coordinates={gpx.points.map((point) => ({
-            latitude: point.latlng[0],
-            longitude: point.latlng[1],
-          }))}
-          strokeColor={colors.primary}
-          strokeWidth={4}
-        />
-      </MapView>
-      <View style={styles.splitSliderContainer}>
-        <Slider
-          style={{ flex: 5, marginHorizontal: 14 }}
-          minimumValue={0}
-          maximumValue={1}
-          minimumTrackTintColor={colors.light}
-          maximumTrackTintColor={colors.accent}
-          onValueChange={(value) => setSliderValue(value)}
-        />
-        <Pressable
-          onPress={() => {
-            navigation.navigate("Post Split", {
-              gpxFileUri,
-              splitIndex: sliderIndex,
-              stravaAccessToken,
-            });
-          }}
-          style={styles.splitButton}
-        >
-          <Text style={styles.splitButtonText}>SPLIT</Text>
-        </Pressable>
-      </View>
-      <View style={styles.chartContainer}>
-        <GpxChartingModule
-          points={gpx.points}
-          chartWidth={Dimensions.get("window").width - 4}
-          chartHeight={200}
-          splitData={splitData}
-        />
-      </View>
-    </View>
+    <UnifiedGpxMapView
+      gpx={gpx}
+      showSlider={true}
+      pressableLabel="SPLIT"
+      onPressablePress={(sliderIndex) => {
+        navigation.navigate("Post Split", {
+          gpxFileUri,
+          splitIndex: sliderIndex,
+          stravaAccessToken,
+        });
+      }}
+    />
   );
 }
 
@@ -167,58 +77,5 @@ const styles = StyleSheet.create({
   titleText: {
     color: colors.light,
     fontSize: 18,
-  },
-  markerText: {
-    fontSize: 30,
-  },
-  splitMarkerContainer: {
-    alignItems: "center",
-    position: "absolute",
-    // positions the marker caret on the split point (hopefully works across devices?)
-    right: -48,
-    top: 0,
-  },
-  splitMarkerCaret: {
-    width: 0,
-    height: 0,
-    backgroundColor: "transparent",
-    borderStyle: "solid",
-    borderLeftWidth: 10,
-    borderRightWidth: 10,
-    borderBottomWidth: 20,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderBottomColor: colors.dark,
-  },
-  splitMarkerBox: {
-    backgroundColor: colors.dark,
-    padding: 2,
-    opacity: 0.8,
-  },
-  map: {
-    width: "100%",
-    height: "100%",
-    flex: 8,
-  },
-  splitSliderContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  splitButton: {
-    alignItems: "center",
-    backgroundColor: colors.accent,
-    padding: 10,
-    borderRadius: 5,
-    flex: 1,
-    marginHorizontal: 14,
-  },
-  splitButtonText: {
-    color: colors.light,
-    fontSize: 24,
-    fontFamily: "BebasNeue-Regular",
-  },
-  chartContainer: {
-    flex: 5.6,
   },
 });
