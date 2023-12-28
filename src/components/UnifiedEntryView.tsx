@@ -57,6 +57,8 @@ type Props = {
 
 export function UnifiedEntryScreen(props: Props) {
   const [error, setError] = useState<string | null>(null);
+  // in case auth bugs are fixed in the future, make sure to prevent double calling of onAuthSuccess
+  const [authSuccessCalled, setAuthSuccessCalled] = useState(false);
 
   const redirectUri = new URL(REDIRECT_URL);
   redirectUri.searchParams.append(
@@ -64,11 +66,9 @@ export function UnifiedEntryScreen(props: Props) {
     AuthSession.makeRedirectUri({
       path: "/auth_redirect",
       isTripleSlashed: true,
-      // native: "com.pelmers.gpxsplice://auth_redirect",
     }),
   );
 
-  console.log("redirect uri", redirectUri.toString());
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: CLIENT_ID,
@@ -83,12 +83,15 @@ export function UnifiedEntryScreen(props: Props) {
   );
 
   const handleAuthResponse = (url: string) => {
+    if (authSuccessCalled) {
+      return;
+    }
     const queryStringStart = url.indexOf("?");
     const queryPart =
       queryStringStart !== -1 ? url.substring(queryStringStart) : "";
     const parsed = queryString.parse(queryPart);
 
-    const {payload, scope} = parsed;
+    const { payload, scope } = parsed;
     if (payload) {
       const payloadObj = JSON.parse(decodeURIComponent(payload as string));
       const accessToken = payloadObj.access_token;
@@ -99,6 +102,7 @@ export function UnifiedEntryScreen(props: Props) {
         //   "Without write permission, I cannot help you upload activities after splitting!",
         // );
       }
+      setAuthSuccessCalled(true);
       props.onAuthSuccess(accessToken, payloadObj.athlete);
     } else {
       const errorDescription = parsed.error_description;
@@ -115,13 +119,12 @@ export function UnifiedEntryScreen(props: Props) {
   }, [response]);
 
   useEffect(() => {
-    // workaround android bug, so if not android, skip
+    // workaround android bug (https://github.com/expo/expo/issues/12044), so if not android, skip
     if (Platform.OS !== "android") {
       return;
     }
     const handler = async (event: Linking.EventType) => {
-      console.log("linking event", event);
-      // TODO does this work? https://github.com/expo/expo/issues/12044#issuecomment-889031264
+      // See: https://github.com/expo/expo/issues/12044#issuecomment-889031264
       handleAuthResponse(event.url);
     };
     const subscription = Linking.addEventListener("url", handler);
@@ -138,8 +141,7 @@ export function UnifiedEntryScreen(props: Props) {
         disabled={!request}
         onPress={async () => {
           try {
-            const response = await promptAsync({ showInRecents: false });
-            console.log("direct response", response);
+            await promptAsync({ showInRecents: false });
             setError(null);
           } catch (e) {
             setError((e as Error).message);
