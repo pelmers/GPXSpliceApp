@@ -8,6 +8,7 @@ import { GpxSummary } from "../utils/gpx";
 import {
   SettingsContext,
   SettingsContextType,
+  useSettings,
 } from "../utils/SettingsProvider";
 import { convert } from "../types/settings";
 
@@ -71,7 +72,7 @@ type Props = {
 
 export function ActivityInfoFragment(props: Props) {
   const { stats, name, location, activityType, isPrivate } = props;
-  const { settings } = useContext(SettingsContext) as SettingsContextType;
+  const { settings } = useSettings();
 
   const typeEmoji = getActivityEmoji(activityType);
   const distanceDisplay = convert(stats.distance || 0, "km", settings);

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { ScrollView, Text, StyleSheet } from "react-native";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -6,18 +6,18 @@ import { Picker } from "@react-native-picker/picker";
 
 import { RootStackParamList } from "../routes";
 
-import { SPEED_UNITS, DISTANCE_UNITS, TEMP_UNITS } from "../types/settings";
 import {
-  SettingsContext,
-  SettingsContextType,
-} from "../utils/SettingsProvider";
+  SPEED_UNITS,
+  DISTANCE_UNITS,
+  TEMP_UNITS,
+  ELEVATION_UNITS,
+} from "../types/settings";
+import { useSettings } from "../utils/SettingsProvider";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
 export function SettingsScreen({ navigation }: Props) {
-  const { settings, setSettings } = useContext(
-    SettingsContext,
-  ) as SettingsContextType;
+  const { settings, setSettings } = useSettings();
 
   return (
     <ScrollView style={styles.container}>
@@ -41,6 +41,17 @@ export function SettingsScreen({ navigation }: Props) {
       >
         <Picker.Item label="Kilometers per hour" value={SPEED_UNITS.KMH} />
         <Picker.Item label="Miles per hour" value={SPEED_UNITS.MPH} />
+      </Picker>
+
+      <Text style={styles.label}>Elevation Units</Text>
+      <Picker
+        selectedValue={settings.elevationUnit}
+        onValueChange={(itemValue) => {
+          setSettings({ ...settings, elevationUnit: itemValue });
+        }}
+      >
+        <Picker.Item label="Meters" value={ELEVATION_UNITS.M} />
+        <Picker.Item label="Feet" value={ELEVATION_UNITS.FT} />
       </Picker>
 
       <Text style={styles.label}>Temperature Units</Text>

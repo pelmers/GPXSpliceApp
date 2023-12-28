@@ -13,31 +13,42 @@ export const TEMP_UNITS = {
   F: "°F",
 } as const;
 
+export const ELEVATION_UNITS = {
+  M: "m",
+  FT: "ft",
+} as const;
+
 export type SpeedKey = keyof typeof SPEED_UNITS;
 export type DistanceKey = keyof typeof DISTANCE_UNITS;
 export type TempKey = keyof typeof TEMP_UNITS;
+export type ElevationKey = keyof typeof ELEVATION_UNITS;
 
 export type SpeedUnit = (typeof SPEED_UNITS)[SpeedKey];
 export type DistanceUnit = (typeof DISTANCE_UNITS)[DistanceKey];
 export type TempUnit = (typeof TEMP_UNITS)[TempKey];
+export type ElevationUnit = (typeof ELEVATION_UNITS)[ElevationKey];
 
 export type SavedSettings = {
   speedUnit: SpeedUnit;
   distanceUnit: DistanceUnit;
   tempUnit: TempUnit;
+  elevationUnit: ElevationUnit;
 };
 
 export const DefaultSettings: SavedSettings = {
   speedUnit: SPEED_UNITS.KMH,
   distanceUnit: DISTANCE_UNITS.KM,
   tempUnit: TEMP_UNITS.C,
+  elevationUnit: ELEVATION_UNITS.M,
 };
+
+type AnyUnit = SpeedUnit | DistanceUnit | TempUnit | ElevationUnit;
 
 export function convert(
   value: number,
-  from: SpeedUnit | DistanceUnit | TempUnit,
+  from: AnyUnit,
   settings: SavedSettings,
-): { value: number; unit: SpeedUnit | DistanceUnit | TempUnit } {
+): { value: number; unit: AnyUnit } {
   switch (from) {
     case SPEED_UNITS.KMH:
     case SPEED_UNITS.MPH:
@@ -56,6 +67,12 @@ export function convert(
       return {
         value: convertTemp(value, from, settings.tempUnit),
         unit: settings.tempUnit,
+      };
+    case ELEVATION_UNITS.M:
+    case ELEVATION_UNITS.FT:
+      return {
+        value: convertElevation(value, from, settings.elevationUnit),
+        unit: settings.elevationUnit,
       };
   }
 }
@@ -86,6 +103,22 @@ function convertDistance(
   }
 
   return value * 1.609;
+}
+
+function convertElevation(
+  value: number,
+  from: ElevationUnit,
+  to: ElevationUnit,
+): number {
+  if (from === to) {
+    return value;
+  }
+
+  if (from === "m") {
+    return value / 3.281;
+  }
+
+  return value * 3.281;
 }
 
 function convertTemp(value: number, from: TempUnit, to: TempUnit): number {

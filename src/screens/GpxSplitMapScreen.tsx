@@ -51,6 +51,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
     );
   }
 
+  // TODO let the user set multiple split points (and then add an undo button i guess)
   return (
     <GpxMapView
       gpx={gpx}

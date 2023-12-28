@@ -2,12 +2,24 @@
 // Contains a row of selector buttons, depending on which button is selected shows an easy line chart
 // Which buttons are available depends on the data in the gpx
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import { StyleSheet, View, Text, Pressable } from "react-native";
 
 import { colors } from "../utils/colors";
 import { GpxPoint, calculateCumulativeDistance } from "../utils/gpx";
 import { EasyLineChart } from "./EasyLineChart";
+import {
+  SettingsContext,
+  SettingsContextType,
+  useSettings,
+} from "../utils/SettingsProvider";
+import {
+  ELEVATION_UNITS,
+  SPEED_UNITS,
+  SavedSettings,
+  TEMP_UNITS,
+  convert,
+} from "../types/settings";
 
 type Props = {
   points: GpxPoint[];
@@ -70,12 +82,12 @@ function enabledForType(chartType: ChartType, points: GpxPoint[]) {
   }
 }
 
-function yAxisUnitsForType(chartType: ChartType) {
+function yAxisUnitsForType(chartType: ChartType, settings: SavedSettings) {
   switch (chartType) {
     case "elevation":
-      return "m";
+      return settings.elevationUnit;
     case "speed":
-      return "kph";
+      return settings.speedUnit;
     case "heartrate":
       return "";
     case "cadence":
@@ -83,11 +95,15 @@ function yAxisUnitsForType(chartType: ChartType) {
     case "power":
       return "W";
     case "temperature":
-      return "°C";
+      return settings.tempUnit;
   }
 }
 
-function computeXYValues(points: GpxPoint[], chartType: ChartType) {
+function computeXYValues(
+  points: GpxPoint[],
+  chartType: ChartType,
+  settings: SavedSettings,
+) {
   if (!enabledForType(chartType, points)) {
     throw new Error("Chart type not enabled for this data");
   }
@@ -97,7 +113,9 @@ function computeXYValues(points: GpxPoint[], chartType: ChartType) {
     const point = points[i];
     switch (chartType) {
       case "elevation":
-        yValues.push(point.altitude ?? 0);
+        yValues.push(
+          convert(point.altitude ?? 0, ELEVATION_UNITS.M, settings).value,
+        );
         break;
       case "speed":
         // speed is distance / time, so it needs 2 points
@@ -113,7 +131,10 @@ function computeXYValues(points: GpxPoint[], chartType: ChartType) {
             yValues.push(yValues[i - 1]);
           } else {
             // convert time from seconds to hours
-            yValues.push(distance / (duration / 3600));
+            yValues.push(
+              convert(distance / (duration / 3600), SPEED_UNITS.KMH, settings)
+                .value,
+            );
           }
         }
         break;
@@ -127,7 +148,7 @@ function computeXYValues(points: GpxPoint[], chartType: ChartType) {
         yValues.push(point.watts ?? 0);
         break;
       case "temperature":
-        yValues.push(point.temp ?? 0);
+        yValues.push(convert(point.temp ?? 0, TEMP_UNITS.C, settings).value);
         break;
     }
   }
@@ -180,8 +201,9 @@ function computeSplitPercent(
 
 export function GpxChartingModule(props: Props) {
   const [chartType, setChartType] = useState<ChartType>("elevation");
+  const { settings } = useSettings();
   const { xValues, yValues } = useMemo(
-    () => computeXYValues(props.points, chartType),
+    () => computeXYValues(props.points, chartType, settings),
     [props.points, chartType],
   );
 
@@ -193,9 +215,8 @@ export function GpxChartingModule(props: Props) {
         )
       : null;
 
-  // TODO: allow different units
-  const xUnits = "km";
-  const yUnits = yAxisUnitsForType(chartType);
+  const xUnits = settings.distanceUnit;
+  const yUnits = yAxisUnitsForType(chartType, settings);
   const splitLabel =
     props.splitData != null
       ? `${yValues[props.splitData.index].toFixed(1)} ${yUnits}
