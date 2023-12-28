@@ -17,10 +17,6 @@ import { colors } from "../utils/colors";
 import { STRAVA_AUTH_ENDPOINT, CLIENT_ID, REDIRECT_URL } from "../utils/client";
 import { StravaAthlete } from "../types/strava";
 
-// TODO does this random fix work? from https://github.com/expo/expo/issues/12044#issuecomment-1609531747
-// Answer: NO
-// WebBrowser.maybeCompleteAuthSession();
-
 export async function getGpxFileUris(options: {
   multiple: boolean;
 }): Promise<string[]> {

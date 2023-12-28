@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import { ResizeMode, Video } from "expo-av";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -41,7 +42,7 @@ export function HomeScreen({ navigation }: Props) {
         <Text style={styles.titleText}>GPX Splice</Text>
       </View>
       <View style={styles.subtitle}>
-        <Text style={styles.subtitleText}>Select an option:</Text>
+        <Text style={styles.subtitleText}>Select an option</Text>
       </View>
       <View style={styles.buttonBackground}>
         <Pressable
@@ -63,9 +64,17 @@ export function HomeScreen({ navigation }: Props) {
           <Text style={styles.buttonText}>COMBINE</Text>
         </Pressable>
       </View>
+      <Icon
+        name="gear"
+        size={40}
+        color={colors.primary}
+        style={{ position: "absolute", top: 40, right: 40 }}
+        onPress={() => {
+          navigation.navigate("Settings");
+        }}
+      />
     </View>
   );
-  // TODO: a settings button on the bottom
 }
 
 const styles = StyleSheet.create({
@@ -76,7 +85,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   bannerVideo: {
-    flex: 2.5,
+    flex: 3.1,
     width: "100%",
     alignSelf: "center",
     resizeMode: "contain",

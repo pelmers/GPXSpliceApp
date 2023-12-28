@@ -14,6 +14,8 @@ import { PostSplitScreen } from "./screens/PostSplitScreen";
 import { CombineEntryScreen } from "./screens/CombineEntryScreen";
 import { CombinePreviewScreen } from "./screens/CombinePreviewScreen";
 import { StravaCombineActivitiesScreen } from "./screens/StravaCombineActivitiesScreen";
+import { SettingsScreen } from "./screens/SettingsScreen";
+import { SettingsProvider } from "./SettingsProvider";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -39,28 +41,34 @@ export default function App() {
     return null;
   }
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="Split" component={SplitEntryScreen} />
-        <Stack.Screen
-          name="Split (Strava)"
-          component={StravaSplitActivitiesScreen}
-        />
-        <Stack.Screen name="Split Map" component={GpxSplitMapScreen} />
-        <Stack.Screen name="Post Split" component={PostSplitScreen} />
-        <Stack.Screen name="Combine" component={CombineEntryScreen} />
-        <Stack.Screen name="Combine Preview" component={CombinePreviewScreen} />
-        <Stack.Screen
-          name="Combine (Strava)"
-          component={StravaCombineActivitiesScreen}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SettingsProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="Split" component={SplitEntryScreen} />
+          <Stack.Screen
+            name="Split (Strava)"
+            component={StravaSplitActivitiesScreen}
+          />
+          <Stack.Screen name="Split Map" component={GpxSplitMapScreen} />
+          <Stack.Screen name="Post Split" component={PostSplitScreen} />
+          <Stack.Screen name="Combine" component={CombineEntryScreen} />
+          <Stack.Screen
+            name="Combine Preview"
+            component={CombinePreviewScreen}
+          />
+          <Stack.Screen
+            name="Combine (Strava)"
+            component={StravaCombineActivitiesScreen}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SettingsProvider>
   );
 }
 
