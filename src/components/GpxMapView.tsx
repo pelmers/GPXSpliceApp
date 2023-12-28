@@ -9,7 +9,7 @@ import { Polyline, Marker } from "react-native-maps";
 
 import { colors } from "../utils/colors";
 import { GpxFile, calculateCumulativeDistance } from "../utils/gpx";
-import { GpxChartingModule } from "../components/GpxChartingModule";
+import { GpxChartingModule } from "./GpxChartingModule";
 
 type Props = {
   gpx: GpxFile;
@@ -20,7 +20,7 @@ type Props = {
 
 // MapView usage docs: https://docs.expo.dev/versions/latest/sdk/map-view/
 
-export function UnifiedGpxMapView({
+export function GpxMapView({
   gpx,
   showSlider,
   pressableLabel,

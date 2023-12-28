@@ -1,9 +1,12 @@
+import { useContext } from "react";
 import { StyleSheet, View, Pressable, Text } from "react-native";
 
 import humanizeDuration from "humanize-duration";
 
 import { colors } from "../utils/colors";
 import { GpxSummary } from "../utils/gpx";
+import { SettingsContext, SettingsContextType } from "../utils/SettingsProvider";
+import { convert } from "../types/settings";
 
 // See full list at https://developers.strava.com/docs/reference/#api-models-SportType
 function getActivityEmoji(activityType: string) {
@@ -65,8 +68,10 @@ type Props = {
 
 export function ActivityInfoFragment(props: Props) {
   const { stats, name, location, activityType, isPrivate } = props;
+  const { settings } = useContext(SettingsContext) as SettingsContextType;
+
   const typeEmoji = getActivityEmoji(activityType);
-  const distanceKm = stats.distance?.toFixed(2);
+  const distanceDisplay = convert(stats.distance || 0, "km", settings);
   const duration = stats.durationMs
     ? formatDuration(stats.durationMs / 1000)
     : null;
@@ -88,8 +93,10 @@ export function ActivityInfoFragment(props: Props) {
           {duration && (
             <Text style={styles.activityInfoRowExtraText}>{duration}</Text>
           )}
-          {distanceKm && (
-            <Text style={styles.activityInfoRowExtraText}>{distanceKm}km</Text>
+          {distanceDisplay && (
+            <Text style={styles.activityInfoRowExtraText}>
+              {distanceDisplay.value.toFixed(2) + " " + distanceDisplay.unit}
+            </Text>
           )}
           {location && (
             <Text style={styles.activityInfoRowExtraText}>{location}</Text>

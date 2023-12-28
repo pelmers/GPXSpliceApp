@@ -10,11 +10,6 @@ module.exports = () => ({
     userInterfaceStyle: "light",
     entryPoint: "./src/App.js",
     scheme: "com.pelmers.gpxsplice",
-    splash: {
-      image: "./assets/splash.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff",
-    },
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,

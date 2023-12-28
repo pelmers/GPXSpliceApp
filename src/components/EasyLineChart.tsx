@@ -1,4 +1,3 @@
-// import { LineChart } from "react-native-wagmi-charts";
 import { LineChart } from "react-native-chart-kit";
 import React from "react";
 import { colors } from "../utils/colors";

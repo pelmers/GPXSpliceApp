@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useContext } from "react";
-import { ScrollView, Text, StyleSheet, ActivityIndicator } from "react-native";
+import React, { useContext } from "react";
+import { ScrollView, Text, StyleSheet } from "react-native";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from "@react-native-picker/picker";
 
-import { colors } from "../utils/colors";
 import { RootStackParamList } from "../routes";
 
 import { SPEED_UNITS, DISTANCE_UNITS, TEMP_UNITS } from "../types/settings";
-import { SettingsContext, SettingsContextType } from "../SettingsProvider";
+import { SettingsContext, SettingsContextType } from "../utils/SettingsProvider";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 

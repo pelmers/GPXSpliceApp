@@ -7,7 +7,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import { fetchStravaActivityGpx } from "../types/strava";
 import { LoadingModal } from "../components/LoadingModal";
-import { UnifiedStravaActivityListView } from "../components/UnifiedStravaActivityListView";
+import { StravaActivityList } from "../components/StravaActivityList";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Split (Strava)">;
 
@@ -20,7 +20,7 @@ export function StravaSplitActivitiesScreen({ navigation, route }: Props) {
     <View style={styles.container}>
       <LoadingModal visible={loadingModal} />
       {error && <Text style={styles.errorText}>{error}</Text>}
-      <UnifiedStravaActivityListView
+      <StravaActivityList
         accessToken={accessToken}
         athlete={athlete}
         instructionText="Press an activity to split"

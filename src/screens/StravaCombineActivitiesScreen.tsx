@@ -8,7 +8,7 @@ import { colors } from "../utils/colors";
 import { RootStackParamList } from "../routes";
 import { StravaActivity, fetchStravaActivityGpx } from "../types/strava";
 import { LoadingModal } from "../components/LoadingModal";
-import { UnifiedStravaActivityListView } from "../components/UnifiedStravaActivityListView";
+import { StravaActivityList } from "../components/StravaActivityList";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Combine (Strava)">;
 
@@ -53,7 +53,7 @@ export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
     <View style={styles.container}>
       <LoadingModal visible={loadingModal} />
       {error && <Text style={styles.errorText}>{error}</Text>}
-      <UnifiedStravaActivityListView
+      <StravaActivityList
         athlete={athlete}
         accessToken={accessToken}
         selectedActivities={selectedActivities}

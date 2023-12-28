@@ -1,4 +1,4 @@
-import { GpxPoint, parseGpxFile, pointsToGpx } from "../utils/gpx";
+import { GpxPoint, pointsToGpx } from "../utils/gpx";
 
 // incomplete, refer to https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities
 export type StravaActivity = { id: number } & Partial<{

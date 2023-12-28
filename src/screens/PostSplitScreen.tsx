@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Dimensions,
   Pressable,
-  Alert,
   ScrollView,
 } from "react-native";
 import * as FileSystem from "expo-file-system";

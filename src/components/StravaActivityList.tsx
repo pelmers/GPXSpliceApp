@@ -5,25 +5,17 @@ import {
   Image,
   Text,
   ActivityIndicator,
-  ScrollView,
   FlatList,
 } from "react-native";
 
-import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
-import * as AuthSession from "expo-auth-session";
 
 import { colors } from "../utils/colors";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../routes";
 import {
   StravaActivity,
   StravaAthlete,
   fetchStravaActivities,
-  fetchStravaActivityGpx,
 } from "../types/strava";
 import { StravaActivityRow } from "./StravaActivityRow";
-import { LoadingModal } from "./LoadingModal";
 
 function displayAthlete(athlete: StravaAthlete) {
   // Render a banner that shows information about the logged in athlete
@@ -55,7 +47,7 @@ type Props = {
   selectedActivities?: StravaActivity[];
 };
 
-export function UnifiedStravaActivityListView(props: Props) {
+export function StravaActivityList(props: Props) {
   const {
     accessToken,
     athlete,

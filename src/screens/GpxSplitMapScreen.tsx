@@ -10,7 +10,7 @@ import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import { GpxFile, parseGpxFile } from "../utils/gpx";
-import { UnifiedGpxMapView } from "../components/UnifiedGpxMapView";
+import { GpxMapView } from "../components/GpxMapView";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Split Map">;
 
@@ -52,7 +52,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
   }
 
   return (
-    <UnifiedGpxMapView
+    <GpxMapView
       gpx={gpx}
       showSlider={true}
       pressableLabel="SPLIT"

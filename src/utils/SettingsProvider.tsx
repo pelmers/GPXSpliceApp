@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
-import { DefaultSettings, SavedSettings } from "./types/settings";
+import { DefaultSettings, SavedSettings } from "../types/settings";
 
 export type SettingsContextType = {
   settings: SavedSettings;

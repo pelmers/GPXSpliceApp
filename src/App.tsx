@@ -15,7 +15,7 @@ import { CombineEntryScreen } from "./screens/CombineEntryScreen";
 import { CombinePreviewScreen } from "./screens/CombinePreviewScreen";
 import { StravaCombineActivitiesScreen } from "./screens/StravaCombineActivitiesScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
-import { SettingsProvider } from "./SettingsProvider";
+import { SettingsProvider } from "./utils/SettingsProvider";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
