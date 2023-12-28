@@ -112,12 +112,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
           title="Split"
           description="This is the split point"
         >
-          <View style={styles.splitMarkerContainer}>
-            <View style={styles.splitMarkerCaret} />
-            <View style={styles.splitMarkerBox}>
-              <Text style={styles.splitMarkerText}>{splitMarkerValue}</Text>
-            </View>
-          </View>
+          <Text style={styles.markerText}>✂️</Text>
         </Marker>
         <Polyline
           coordinates={gpx.points.map((point) => ({
@@ -125,7 +120,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
             longitude: point.latlng[1],
           }))}
           strokeColor={colors.primary}
-          strokeWidth={5}
+          strokeWidth={4}
         />
       </MapView>
       <View style={styles.splitSliderContainer}>
@@ -174,11 +169,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   markerText: {
-    fontSize: 50,
-  },
-  splitMarkerText: {
     fontSize: 30,
-    color: colors.light,
   },
   splitMarkerContainer: {
     alignItems: "center",

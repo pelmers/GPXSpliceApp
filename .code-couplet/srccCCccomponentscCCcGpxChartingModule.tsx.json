@@ -4,27 +4,27 @@
     {
       "commentRange": {
         "start": {
-          "line": 217,
+          "line": 221,
           "char": 0
         },
         "end": {
-          "line": 217,
+          "line": 221,
           "char": 82
         }
       },
       "codeRange": {
         "start": {
-          "line": 218,
+          "line": 222,
           "char": 0
         },
         "end": {
-          "line": 228,
-          "char": 11
+          "line": 231,
+          "char": 14
         }
       },
       "codeRelativePath": "",
-      "commentValue": "          // 64 and 32 are the margins of the chart axes, determined by inspection",
-      "codeValue": "          <View\n            style={{\n              position: \"absolute\",\n              left: 64 + (props.chartWidth - 64) * splitPercent,\n              top: 16,\n              bottom: 32,\n              width: 2,\n              opacity: 0.7,\n              backgroundColor: colors.primary,\n            }}\n          >",
+      "commentValue": "          // 64 and 16 are the margins of the chart axes, determined by inspection",
+      "codeValue": "          <View\n            style={{\n              position: \"absolute\",\n              left: 64 + (props.chartWidth - 64) * splitPercent,\n              top: 32,\n              bottom: 32,\n              width: 2,\n              opacity: 0.7,\n              backgroundColor: colors.primary,\n            }}",
       "id": 0
     }
   ],

@@ -192,10 +192,14 @@ export function GpxChartingModule(props: Props) {
           props.splitData.index,
         )
       : null;
+
+  // TODO: allow different units
+  const xUnits = "km";
   const yUnits = yAxisUnitsForType(chartType);
   const splitLabel =
     props.splitData != null
-      ? `${yValues[props.splitData.index].toFixed(1)} ${yUnits}`
+      ? `${yValues[props.splitData.index].toFixed(1)} ${yUnits}
+${xValues[props.splitData.index].toFixed(1)} ${xUnits}`
       : null;
   // A row of buttons with icons, then a chart below and a split marker that follows the slider if given
   return (
@@ -215,12 +219,12 @@ export function GpxChartingModule(props: Props) {
           height={props.chartHeight}
         />
         {splitPercent != null && (
-          // 64 and 32 are the margins of the chart axes, determined by inspection
+          // 64 and 16 are the margins of the chart axes, determined by inspection
           <View
             style={{
               position: "absolute",
               left: 64 + (props.chartWidth - 64) * splitPercent,
-              top: 16,
+              top: 32,
               bottom: 32,
               width: 2,
               opacity: 0.7,
@@ -228,7 +232,7 @@ export function GpxChartingModule(props: Props) {
             }}
           >
             <View
-              style={{ position: "absolute", top: -20, left: -50, width: 100 }}
+              style={{ position: "absolute", top: -32, left: -50, width: 100 }}
             >
               <Text style={{ color: "white", textAlign: "center" }}>
                 {splitLabel}
