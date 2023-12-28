@@ -5,7 +5,10 @@ import humanizeDuration from "humanize-duration";
 
 import { colors } from "../utils/colors";
 import { GpxSummary } from "../utils/gpx";
-import { SettingsContext, SettingsContextType } from "../utils/SettingsProvider";
+import {
+  SettingsContext,
+  SettingsContextType,
+} from "../utils/SettingsProvider";
 import { convert } from "../types/settings";
 
 // See full list at https://developers.strava.com/docs/reference/#api-models-SportType

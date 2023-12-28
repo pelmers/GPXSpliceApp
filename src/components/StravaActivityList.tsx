@@ -8,7 +8,6 @@ import {
   FlatList,
 } from "react-native";
 
-
 import { colors } from "../utils/colors";
 import {
   StravaActivity,

@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  Text,
-  Platform,
-} from "react-native";
+import { StyleSheet, View, Pressable, Text, Platform } from "react-native";
 
 import { ResizeMode, Video } from "expo-av";
 import Icon from "react-native-vector-icons/FontAwesome";

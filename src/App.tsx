@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import * as Font from "expo-font";
 import { registerRootComponent } from "expo";
+import Toast from "react-native-toast-message";
 
 import { HomeScreen } from "./screens/HomeScreen";
 import { NavigationContainer } from "@react-navigation/native";
@@ -68,6 +69,7 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
+      <Toast />
     </SettingsProvider>
   );
 }

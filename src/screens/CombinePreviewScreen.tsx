@@ -12,6 +12,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import { GpxFile, parseGpxFile, pointsToGpx } from "../utils/gpx";
 import { GpxMapView } from "../components/GpxMapView";
+import { successToast } from "../utils/toast";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Combine Preview">;
 
@@ -98,6 +99,7 @@ export function CombinePreviewScreen({ navigation, route }: Props) {
             dialogTitle: "Share GPX File",
             UTI: "com.topografix.gpx",
           });
+          successToast(`Exported ${gpx.name}`);
         } catch (e) {
           console.error(e);
           setError((e as Error).message);

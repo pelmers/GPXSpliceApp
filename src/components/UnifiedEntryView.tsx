@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  Text,
-  Platform,
-} from "react-native";
+import { StyleSheet, View, Pressable, Text, Platform } from "react-native";
 import queryString from "query-string";
 
 import * as DocumentPicker from "expo-document-picker";
@@ -132,7 +126,7 @@ export function UnifiedEntryScreen(props: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>{props.title}</Text>
       <Pressable
-        style={styles.stravaButton}
+        style={[styles.button, { backgroundColor: colors.strava }]}
         disabled={!request}
         onPress={async () => {
           try {
@@ -167,26 +161,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: colors.dark,
   },
   title: {
-    fontSize: 24,
+    fontSize: 45,
     marginBottom: 20,
+    fontFamily: "BebasNeue-Regular",
+    color: colors.light,
   },
   button: {
+    justifyContent: "center",
     backgroundColor: colors.accent,
     padding: 10,
     marginVertical: 10,
     borderRadius: 5,
-  },
-  stravaButton: {
-    backgroundColor: colors.strava,
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
+    height: 50,
+    width: 200,
   },
   buttonText: {
+    textAlign: "center",
     color: "white",
-    fontSize: 16,
+    lineHeight: 24,
+    fontSize: 21,
+    fontWeight: "bold",
   },
   errorText: {
     color: "red",

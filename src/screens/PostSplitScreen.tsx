@@ -23,6 +23,7 @@ import {
 } from "../utils/gpx";
 import { GpxChartingModule } from "../components/GpxChartingModule";
 import { ActivityInfoFragment } from "../components/ActivityInfoFragment";
+import { successToast } from "../utils/toast";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Post Split">;
 
@@ -113,6 +114,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
                         dialogTitle: "Share GPX File",
                         UTI: "com.topografix.gpx",
                       });
+                      successToast(`Exported ${file.name}`);
                     } catch (e) {
                       console.error(e);
                       setError((e as Error).message);

@@ -7,7 +7,10 @@ import { Picker } from "@react-native-picker/picker";
 import { RootStackParamList } from "../routes";
 
 import { SPEED_UNITS, DISTANCE_UNITS, TEMP_UNITS } from "../types/settings";
-import { SettingsContext, SettingsContextType } from "../utils/SettingsProvider";
+import {
+  SettingsContext,
+  SettingsContextType,
+} from "../utils/SettingsProvider";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
