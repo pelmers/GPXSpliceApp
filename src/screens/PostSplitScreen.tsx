@@ -23,7 +23,6 @@ import {
 } from "../utils/gpx";
 import { GpxChartingModule } from "../components/GpxChartingModule";
 import { ActivityInfoFragment } from "../components/ActivityInfoFragment";
-import { successToast } from "../utils/toast";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Post Split">;
 
@@ -84,7 +83,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
 
   // For each file, show a summary of stats + a charting module + 2 buttons (share, upload)
   return (
-    <ScrollView>
+    <ScrollView style={styles.container}>
       {gpxFiles &&
         gpxFiles.map((file, index) => {
           const stats = gpxSummaryStats(file.points);
@@ -96,6 +95,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
                   name={file.name}
                   isPrivate={false}
                   activityType={file.type}
+                  textColor={colors.light}
                 />
               </View>
               <GpxChartingModule
@@ -114,7 +114,6 @@ export function PostSplitScreen({ navigation, route }: Props) {
                         dialogTitle: "Share GPX File",
                         UTI: "com.topografix.gpx",
                       });
-                      successToast(`Exported ${file.name}`);
                     } catch (e) {
                       console.error(e);
                       setError((e as Error).message);
@@ -141,6 +140,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
                   borderBottomWidth: 1,
                   opacity: 0.2,
                   marginHorizontal: 100,
+                  marginTop: 10,
                 }}
               ></View>
             </View>
@@ -155,8 +155,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.dark,
-    alignItems: "center",
-    justifyContent: "center",
   },
   activityFragmentContainer: {
     flex: 1,
@@ -165,6 +163,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 5,
     paddingHorizontal: 15,
+    paddingVertical: 5,
+    backgroundColor: colors.accent,
   },
   actionButtonsContainer: {
     flex: 1,
@@ -177,7 +177,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     padding: 10,
     marginBottom: 10,
-    // marginRight: 25,
+    width: 180,
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 5,
   },
   uploadButton: {
@@ -188,7 +190,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   buttonText: {
+    fontWeight: "bold",
     color: "white",
-    fontSize: 16,
+    fontSize: 17,
   },
 });

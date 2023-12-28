@@ -47,7 +47,6 @@ export function GpxMapView({
         }
       : undefined;
 
-  // TODO: set up a units layer so that the user can choose between miles and km
   return (
     <View style={styles.container}>
       <Text style={styles.titleText}>{titleText}</Text>
@@ -89,7 +88,7 @@ export function GpxMapView({
             title="Split"
             description="This is the split point"
           >
-            <Text style={styles.markerText}>✂️</Text>
+            <Text style={styles.markerText}>⭐️</Text>
           </Marker>
         )}
         <Polyline
@@ -98,7 +97,7 @@ export function GpxMapView({
             longitude: point.latlng[1],
           }))}
           strokeColor={colors.primary}
-          strokeWidth={4}
+          strokeWidth={5}
         />
       </MapView>
       <View style={styles.splitSliderContainer}>
@@ -145,7 +144,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   markerText: {
-    fontSize: 30,
+    fontSize: 40,
   },
   splitMarkerContainer: {
     alignItems: "center",

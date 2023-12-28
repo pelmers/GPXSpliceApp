@@ -46,8 +46,6 @@ type Props = {
 
 export function UnifiedEntryScreen(props: Props) {
   const [error, setError] = useState<string | null>(null);
-  // in case auth bugs are fixed in the future, make sure to prevent double calling of onAuthSuccess
-  const [authSuccessCalled, setAuthSuccessCalled] = useState(false);
 
   const redirectUri = new URL(REDIRECT_URL);
   redirectUri.searchParams.append(
@@ -72,9 +70,6 @@ export function UnifiedEntryScreen(props: Props) {
   );
 
   const handleAuthResponse = (url: string) => {
-    if (authSuccessCalled) {
-      return;
-    }
     const queryStringStart = url.indexOf("?");
     const queryPart =
       queryStringStart !== -1 ? url.substring(queryStringStart) : "";
@@ -91,7 +86,6 @@ export function UnifiedEntryScreen(props: Props) {
         //   "Without write permission, I cannot help you upload activities after splitting!",
         // );
       }
-      setAuthSuccessCalled(true);
       props.onAuthSuccess(accessToken, payloadObj.athlete);
     } else {
       const errorDescription = parsed.error_description;

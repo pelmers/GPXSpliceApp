@@ -19,6 +19,8 @@ CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
 
 STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token'
+# TODO: add a favicon
+# TODO: post to my analytics server as well
 
 class RedirectHandler(BaseHTTPRequestHandler):
     def do_GET(self):

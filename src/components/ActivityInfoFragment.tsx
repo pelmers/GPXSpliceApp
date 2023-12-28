@@ -67,12 +67,17 @@ type Props = {
   name: string;
   activityType: string;
   isPrivate: boolean;
-  location?: string | null;
+  location?: string;
+  textColor?: string;
 };
 
 export function ActivityInfoFragment(props: Props) {
   const { stats, name, location, activityType, isPrivate } = props;
+  const color = props.textColor || colors.dark;
   const { settings } = useSettings();
+
+  const activityNameTextStyle = [styles.activityInfoNameText, { color }];
+  const extraTextStyle = [styles.activityInfoRowExtraText, { color }];
 
   const typeEmoji = getActivityEmoji(activityType);
   const distanceDisplay = convert(stats.distance || 0, "km", settings);
@@ -86,27 +91,23 @@ export function ActivityInfoFragment(props: Props) {
   return (
     <>
       <View>
-        <Text style={{ fontSize: 30 }}>{typeEmoji}</Text>
+        <Text style={{ fontSize: 30, color }}>{typeEmoji}</Text>
       </View>
       <View>
         <View style={{ flexDirection: "row" }}>
-          <Text style={styles.activityInfoNameText}>{name}</Text>
+          <Text style={activityNameTextStyle}>{name}</Text>
         </View>
         <View style={{ flexDirection: "row" }}>
-          <Text style={styles.activityInfoRowExtraText}>{publicText}</Text>
-          {duration && (
-            <Text style={styles.activityInfoRowExtraText}>{duration}</Text>
-          )}
+          <Text style={extraTextStyle}>{publicText}</Text>
+          {duration && <Text style={extraTextStyle}>{duration}</Text>}
           {distanceDisplay && (
-            <Text style={styles.activityInfoRowExtraText}>
+            <Text style={extraTextStyle}>
               {distanceDisplay.value.toFixed(2) + " " + distanceDisplay.unit}
             </Text>
           )}
-          {location && (
-            <Text style={styles.activityInfoRowExtraText}>{location}</Text>
-          )}
+          {location && <Text style={extraTextStyle}>{location}</Text>}
           {timeSinceActivity && (
-            <Text style={styles.activityInfoRowExtraText}>
+            <Text style={extraTextStyle}>
               {humanizeDuration(timeSinceActivity, {
                 largest: 1,
                 round: true,
