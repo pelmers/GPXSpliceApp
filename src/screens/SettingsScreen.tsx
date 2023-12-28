@@ -14,7 +14,9 @@ import { SettingsContext, SettingsContextType } from "../SettingsProvider";
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
 export function SettingsScreen({ navigation }: Props) {
-    const { settings, setSettings } = useContext(SettingsContext) as SettingsContextType;
+  const { settings, setSettings } = useContext(
+    SettingsContext,
+  ) as SettingsContextType;
 
   return (
     <ScrollView style={styles.container}>
@@ -22,7 +24,7 @@ export function SettingsScreen({ navigation }: Props) {
       <Picker
         selectedValue={settings.distanceUnit}
         onValueChange={(itemValue) => {
-            setSettings({...settings, distanceUnit: itemValue});
+          setSettings({ ...settings, distanceUnit: itemValue });
         }}
       >
         <Picker.Item label="Kilometers" value={DISTANCE_UNITS.KM} />
@@ -33,7 +35,7 @@ export function SettingsScreen({ navigation }: Props) {
       <Picker
         selectedValue={settings.speedUnit}
         onValueChange={(itemValue) => {
-          setSettings({...settings, speedUnit: itemValue});
+          setSettings({ ...settings, speedUnit: itemValue });
         }}
       >
         <Picker.Item label="Kilometers per hour" value={SPEED_UNITS.KMH} />
@@ -44,7 +46,7 @@ export function SettingsScreen({ navigation }: Props) {
       <Picker
         selectedValue={settings.tempUnit}
         onValueChange={(itemValue) => {
-            setSettings({...settings, tempUnit: itemValue});
+          setSettings({ ...settings, tempUnit: itemValue });
         }}
       >
         <Picker.Item label="Celsius" value={TEMP_UNITS.C} />
