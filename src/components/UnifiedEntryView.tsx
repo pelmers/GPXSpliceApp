@@ -1,9 +1,16 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Pressable, Alert, Text } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Alert,
+  Text,
+  Platform,
+} from "react-native";
+import queryString from "query-string";
 
 import * as DocumentPicker from "expo-document-picker";
 import * as AuthSession from "expo-auth-session";
-import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 
 import { colors } from "../utils/colors";
@@ -11,7 +18,8 @@ import { STRAVA_AUTH_ENDPOINT, CLIENT_ID, REDIRECT_URL } from "../utils/client";
 import { StravaAthlete } from "../types/strava";
 
 // TODO does this random fix work? from https://github.com/expo/expo/issues/12044#issuecomment-1609531747
-WebBrowser.maybeCompleteAuthSession();
+// Answer: NO
+// WebBrowser.maybeCompleteAuthSession();
 
 export async function getGpxFileUris(options: {
   multiple: boolean;
@@ -50,39 +58,77 @@ type Props = {
 export function UnifiedEntryScreen(props: Props) {
   const [error, setError] = useState<string | null>(null);
 
+  const redirectUri = new URL(REDIRECT_URL);
+  redirectUri.searchParams.append(
+    "client_uri",
+    AuthSession.makeRedirectUri({
+      path: "/auth_redirect",
+      isTripleSlashed: true,
+      // native: "com.pelmers.gpxsplice://auth_redirect",
+    }),
+  );
+
+  console.log("redirect uri", redirectUri.toString());
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: CLIENT_ID,
       scopes: ["activity:read_all"],
       // TODO ask for write when we implement upload, btw scopes needs to be a single string
       // scopes: ["activity:read_all,activity:write"],
-      redirectUri:
-        REDIRECT_URL + "?client_uri=" + AuthSession.makeRedirectUri(),
+      redirectUri: redirectUri.toString(),
     },
     {
       authorizationEndpoint: STRAVA_AUTH_ENDPOINT,
     },
   );
 
-  React.useEffect(() => {
-    console.log(response);
+  const handleAuthResponse = (url: string) => {
+    const queryStringStart = url.indexOf("?");
+    const queryPart =
+      queryStringStart !== -1 ? url.substring(queryStringStart) : "";
+    const parsed = queryString.parse(queryPart);
+
+    const {payload, scope} = parsed;
+    if (payload) {
+      const payloadObj = JSON.parse(decodeURIComponent(payload as string));
+      const accessToken = payloadObj.access_token;
+      if (scope && !scope.includes("activity:write")) {
+        // TODO Alert uncomment alert below when we implement upload
+        // Alert.alert(
+        //   "Warning",
+        //   "Without write permission, I cannot help you upload activities after splitting!",
+        // );
+      }
+      props.onAuthSuccess(accessToken, payloadObj.athlete);
+    } else {
+      const errorDescription = parsed.error_description;
+      if (errorDescription) {
+        setError(errorDescription as string);
+      }
+    }
+  };
+
+  useEffect(() => {
     if (response != null && response.type === "success") {
-          // read access token from response by parsing 'payload' param which the redirect server gives us
-          const payload = JSON.parse(response.params.payload);
-          const accessToken = payload.access_token;
-          const { scope } = response.params;
-          if (!scope.includes("activity:write")) {
-            // TODO Alert uncomment alert below when we implement upload
-            // Alert.alert(
-            //   "Warning",
-            //   "Without write permission, I cannot help you upload activities after splitting!",
-            // );
-          }
-          props.onAuthSuccess(accessToken, payload.athlete);
-        } else if (response != null && response.type === "error") {
-        setError(response.params.error_description);
-        }
-    } , [response]);
+      handleAuthResponse(response.url);
+    }
+  }, [response]);
+
+  useEffect(() => {
+    // workaround android bug, so if not android, skip
+    if (Platform.OS !== "android") {
+      return;
+    }
+    const handler = async (event: Linking.EventType) => {
+      console.log("linking event", event);
+      // TODO does this work? https://github.com/expo/expo/issues/12044#issuecomment-889031264
+      handleAuthResponse(event.url);
+    };
+    const subscription = Linking.addEventListener("url", handler);
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -92,7 +138,8 @@ export function UnifiedEntryScreen(props: Props) {
         disabled={!request}
         onPress={async () => {
           try {
-            await promptAsync({ showInRecents: false });
+            const response = await promptAsync({ showInRecents: false });
+            console.log("direct response", response);
             setError(null);
           } catch (e) {
             setError((e as Error).message);

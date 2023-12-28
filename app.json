@@ -23,12 +23,21 @@
       "intentFilters": [
         {
           "action": "VIEW",
-          "data": {
-            "scheme": "https",
-            "host": "gpxspliceredirect.pelmers.com",
-            "pathPrefix": "/"
-          },
+          "data": [
+            {
+              "scheme": "https",
+              "host": "gpxspliceredirect.pelmers.com",
+              "pathPrefix": "/"
+            }
+          ],
           "category": ["BROWSABLE", "DEFAULT"]
+        },
+        {
+          "action": "VIEW",
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": {
+            "scheme": "com.pelmers.gpxsplice"
+          }
         }
       ]
     },
