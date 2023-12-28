@@ -22,7 +22,7 @@ export async function getGpxFileUris(options: {
 
   if (result.assets != null) {
     const uris = result.assets.map((file) => {
-      if (!file.uri.endsWith(".gpx")) {
+      if (!file.uri.endsWith(".gpx") && !file.file?.name.endsWith(".gpx")) {
         throw new Error("All selected files must be .gpx files");
       }
       return file.uri;
