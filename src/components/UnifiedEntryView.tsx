@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Pressable, Text, Platform } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Text,
+  Platform,
+  TouchableHighlight,
+} from "react-native";
 import queryString from "query-string";
 
 import * as DocumentPicker from "expo-document-picker";
@@ -119,7 +126,8 @@ export function UnifiedEntryScreen(props: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{props.title}</Text>
-      <Pressable
+      <TouchableHighlight
+        underlayColor={colors.primary}
         style={[styles.button, { backgroundColor: colors.strava }]}
         disabled={!request}
         onPress={async () => {
@@ -132,9 +140,10 @@ export function UnifiedEntryScreen(props: Props) {
         }}
       >
         <Text style={styles.buttonText}>Load from Strava</Text>
-      </Pressable>
-      <Pressable
+      </TouchableHighlight>
+      <TouchableHighlight
         style={styles.button}
+        underlayColor={colors.primary}
         onPress={async () => {
           try {
             await props.onSelectPress();
@@ -144,7 +153,7 @@ export function UnifiedEntryScreen(props: Props) {
         }}
       >
         <Text style={styles.buttonText}>Select File(s)</Text>
-      </Pressable>
+      </TouchableHighlight>
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );

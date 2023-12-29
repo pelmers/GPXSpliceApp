@@ -1,5 +1,12 @@
 import React from "react";
-import { StyleSheet, View, Pressable, Text, Platform } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Text,
+  Platform,
+  TouchableHighlight,
+} from "react-native";
 
 import { ResizeMode, Video } from "expo-av";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -38,24 +45,26 @@ export function HomeScreen({ navigation }: Props) {
         <Text style={styles.subtitleText}>Select an option</Text>
       </View>
       <View style={styles.buttonBackground}>
-        <Pressable
+        <TouchableHighlight
+          underlayColor={colors.secondary}
           onPress={() => {
             navigation.navigate("Split");
           }}
           style={styles.button}
         >
           <Text style={styles.buttonText}>SPLIT</Text>
-        </Pressable>
+        </TouchableHighlight>
       </View>
       <View style={styles.buttonBackground}>
-        <Pressable
+        <TouchableHighlight
+          underlayColor={colors.primary}
           onPress={() => {
             navigation.navigate("Combine");
           }}
           style={styles.button}
         >
           <Text style={styles.buttonText}>COMBINE</Text>
-        </Pressable>
+        </TouchableHighlight>
       </View>
       <Icon
         name="gear"
@@ -137,6 +146,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 0.25,
     textAlign: "center",
-    color: colors.primary,
+    color: colors.light,
   },
 });

@@ -1,4 +1,10 @@
-import { StyleSheet, View, Pressable, Text } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Text,
+  TouchableHighlight,
+} from "react-native";
 
 import humanizeDuration from "humanize-duration";
 
@@ -20,7 +26,7 @@ export function StravaActivityRow(props: Props) {
     activity.map.summary_polyline.length > 0;
   return (
     <View>
-      <Pressable
+      <TouchableHighlight
         style={[
           styles.activityInfoContainer,
           selected ? { backgroundColor: colors.light + "88" } : {},
@@ -28,6 +34,7 @@ export function StravaActivityRow(props: Props) {
         ]}
         onPress={() => props.onPress(activity)}
         disabled={!hasGps}
+        underlayColor={colors.primary}
       >
         <ActivityInfoFragment
           isPrivate={!!activity.private}
@@ -42,9 +49,9 @@ export function StravaActivityRow(props: Props) {
           }}
           name={activity.name ?? "Unknown name"}
           activityType={activity.type ?? "Unknown type"}
-          location={activity.location_city}
+          location={activity.location_city ?? undefined}
         />
-      </Pressable>
+      </TouchableHighlight>
       <View
         style={{
           borderBottomColor: colors.light,

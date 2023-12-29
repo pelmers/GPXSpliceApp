@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Pressable, Text, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Text,
+  Dimensions,
+  TouchableHighlight,
+} from "react-native";
 import Slider from "@react-native-community/slider";
 
 // For web, consider @teovilla/react-native-web-maps
@@ -111,14 +118,15 @@ export function GpxMapView({
             onValueChange={(value) => setSliderValue(value)}
           />
         )}
-        <Pressable
+        <TouchableHighlight
+          underlayColor={colors.primary}
           onPress={async () => {
             await onPressablePress(sliderIndex);
           }}
           style={styles.splitButton}
         >
           <Text style={styles.splitButtonText}>{pressableLabel}</Text>
-        </Pressable>
+        </TouchableHighlight>
       </View>
       <View style={styles.chartContainer}>
         <GpxChartingModule

@@ -9,6 +9,7 @@ import {
   Dimensions,
   Pressable,
   ScrollView,
+  TouchableHighlight,
 } from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
@@ -104,7 +105,8 @@ export function PostSplitScreen({ navigation, route }: Props) {
                 chartHeight={180}
               />
               <View style={styles.actionButtonsContainer}>
-                <Pressable
+                <TouchableHighlight
+                  underlayColor={colors.primary}
                   style={styles.exportButton}
                   onPress={async () => {
                     try {
@@ -121,9 +123,10 @@ export function PostSplitScreen({ navigation, route }: Props) {
                   }}
                 >
                   <Text style={styles.buttonText}>💾 Export</Text>
-                </Pressable>
+                </TouchableHighlight>
 
-                {/* <Pressable
+                {/* <TouchableHighlight
+          underlayColor={colors.primary}
                   style={styles.uploadButton}
                   onPress={() => {
                     // TODO: Implement upload functionality
@@ -132,7 +135,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
                   }}
                 >
                   <Text style={styles.buttonText}>⬆️ Upload</Text>
-                </Pressable> */}
+                </TouchableHighlight> */}
               </View>
               <View
                 style={{
@@ -146,7 +149,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
             </View>
           );
         })}
-      {error && <Text>{error}</Text>}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </ScrollView>
   );
 }
@@ -155,6 +158,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.dark,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 30,
+    fontWeight: "bold",
+    margin: 10,
   },
   activityFragmentContainer: {
     flex: 1,

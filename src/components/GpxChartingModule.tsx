@@ -2,17 +2,13 @@
 // Contains a row of selector buttons, depending on which button is selected shows an easy line chart
 // Which buttons are available depends on the data in the gpx
 
-import React, { useState, useMemo, useContext } from "react";
-import { StyleSheet, View, Text, Pressable } from "react-native";
+import React, { useState, useMemo } from "react";
+import { StyleSheet, View, Text, TouchableHighlight } from "react-native";
 
 import { colors } from "../utils/colors";
 import { GpxPoint, calculateCumulativeDistance } from "../utils/gpx";
 import { EasyLineChart } from "./EasyLineChart";
-import {
-  SettingsContext,
-  SettingsContextType,
-  useSettings,
-} from "../utils/SettingsProvider";
+import { useSettings } from "../utils/SettingsProvider";
 import {
   ELEVATION_UNITS,
   SPEED_UNITS,
@@ -166,7 +162,8 @@ function ChartButtonRow(props: {
         const enabled = enabledForType(type, props.points);
         const icon = iconForType(type);
         return (
-          <Pressable
+          <TouchableHighlight
+            underlayColor={colors.primary}
             key={type}
             onPress={() => props.onPress(type)}
             style={[
@@ -180,7 +177,7 @@ function ChartButtonRow(props: {
             disabled={!enabled}
           >
             <Text style={styles.buttonText}>{icon}</Text>
-          </Pressable>
+          </TouchableHighlight>
         );
       })}
     </View>

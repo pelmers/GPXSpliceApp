@@ -4,7 +4,7 @@ import {
   Text,
   ScrollView,
   Linking,
-  TouchableOpacity,
+  TouchableHighlight,
   StyleSheet,
 } from "react-native";
 
@@ -17,8 +17,8 @@ import { colors } from "../utils/colors";
 type Props = NativeStackScreenProps<RootStackParamList, "Info">;
 
 export function InfoScreen({ navigation }: Props) {
-  const appName = Constants.expoConfig?.name || 'GPX Splice';
-  const appVersion = Constants.expoConfig?.version || '1.0.0';
+  const appName = Constants.expoConfig?.name || "GPX Splice";
+  const appVersion = Constants.expoConfig?.version || "1.0.0";
   // TODO update this URL when the app is published
   const reviewUrl = "https://app-review-url";
 
@@ -32,22 +32,36 @@ export function InfoScreen({ navigation }: Props) {
       <Text style={styles.title}>
         {appName} v{appVersion}
       </Text>
-      <TouchableOpacity onPress={() => Linking.openURL(reviewUrl)}>
+      <TouchableHighlight
+        style={styles.linkContainer}
+        underlayColor={colors.tertiary}
+        onPress={() => Linking.openURL(reviewUrl)}
+      >
         <Text style={styles.link}>Leave a Review</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => Linking.openURL(issueUrl)}>
+      </TouchableHighlight>
+      <TouchableHighlight
+        style={styles.linkContainer}
+        underlayColor={colors.tertiary}
+        onPress={() => Linking.openURL(issueUrl)}
+      >
         <Text style={styles.link}>Report an Issue</Text>
-      </TouchableOpacity>
-      <Text style={styles.author}>Author</Text>
+      </TouchableHighlight>
+      <Text style={styles.author}>About the Author</Text>
       <Text style={styles.authorName}>{authorName}</Text>
-      <TouchableOpacity onPress={() => Linking.openURL(authorWebsite)}>
+      <TouchableHighlight
+        style={styles.linkContainer}
+        underlayColor={colors.tertiary}
+        onPress={() => Linking.openURL(authorWebsite)}
+      >
         <Text style={styles.link}>Visit Website</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </TouchableHighlight>
+      <TouchableHighlight
+        style={styles.linkContainer}
+        underlayColor={colors.tertiary}
         onPress={() => Linking.openURL(`mailto:${authorEmail}`)}
       >
-        <Text style={styles.link}>Contact (email)</Text>
-      </TouchableOpacity>
+        <Text style={styles.link}>Contact</Text>
+      </TouchableHighlight>
     </ScrollView>
   );
 }
@@ -63,13 +77,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: colors.primary,
   },
-  link: {
+  linkContainer: {
     marginTop: 20,
-    color: 'white',
     backgroundColor: colors.accent,
     width: 150,
-    padding: 10,
     justifyContent: "center",
+  },
+  link: {
+    color: "white",
+    padding: 10,
     textAlign: "center",
   },
   author: {

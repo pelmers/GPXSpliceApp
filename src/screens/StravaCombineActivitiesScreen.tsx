@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  TouchableHighlight,
+} from "react-native";
 
 import * as FileSystem from "expo-file-system";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -75,12 +81,13 @@ export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
         }}
       />
       {selectedActivities.length >= 2 && (
-        <Pressable
+        <TouchableHighlight
+          underlayColor={colors.primary}
           style={styles.combineButton}
           onPress={fetchAllSelectedActivities}
         >
           <Text style={styles.combineButtonText}>COMBINE 👟</Text>
-        </Pressable>
+        </TouchableHighlight>
       )}
     </View>
   );
