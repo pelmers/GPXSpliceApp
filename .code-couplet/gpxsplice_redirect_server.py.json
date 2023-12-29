@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "comments": [
+    {
+      "commentRange": {
+        "start": {
+          "line": 29,
+          "char": 15
+        },
+        "end": {
+          "line": 29,
+          "char": 33
+        }
+      },
+      "codeRange": {
+        "start": {
+          "line": 32,
+          "char": 37
+        },
+        "end": {
+          "line": 32,
+          "char": 55
+        }
+      },
+      "codeRelativePath": "",
+      "commentValue": "assets/favicon.ico",
+      "codeValue": "assets/favicon.ico",
+      "id": 0
+    }
+  ],
+  "configuration": {
+    "lineComment": "#"
+  }
+}

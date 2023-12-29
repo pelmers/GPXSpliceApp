@@ -19,17 +19,13 @@ import { SettingsProvider } from "./utils/SettingsProvider";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-Font.loadAsync({
-  "BebasNeue-Regular": require("../assets/fonts/BebasNeue-Regular.ttf"),
-});
-
 export default function App() {
   const [fontLoaded, setFontLoaded] = useState(false);
 
   useEffect(() => {
     async function loadFont() {
       await Font.loadAsync({
-        "Audiowide-Regular": require("../assets/fonts/BebasNeue-Regular.ttf"),
+        "BebasNeue-Regular": require("../assets/fonts/BebasNeue-Regular.ttf"),
       });
       setFontLoaded(true);
     }

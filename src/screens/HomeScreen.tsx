@@ -12,6 +12,8 @@ import { BlurView } from "expo-blur";
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export function HomeScreen({ navigation }: Props) {
+  // TODO question icon at bottom right that goes to a contact screen
+  // TODO on that screen put app/version info and links to github issues + review page + email link
   return (
     <View style={styles.container}>
       <Video
