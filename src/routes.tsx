@@ -3,6 +3,7 @@ import { StravaAthlete } from "./types/strava";
 export type RootStackParamList = {
   Home: undefined;
   Settings: undefined;
+  Info: undefined;
   Split: undefined;
   Combine: undefined;
   "Combine Preview": {

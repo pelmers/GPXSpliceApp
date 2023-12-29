@@ -16,6 +16,7 @@ import { CombinePreviewScreen } from "./screens/CombinePreviewScreen";
 import { StravaCombineActivitiesScreen } from "./screens/StravaCombineActivitiesScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
 import { SettingsProvider } from "./utils/SettingsProvider";
+import { InfoScreen } from "./screens/InfoScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -46,6 +47,7 @@ export default function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="Info" component={InfoScreen} />
           <Stack.Screen name="Split" component={SplitEntryScreen} />
           <Stack.Screen
             name="Split (Strava)"

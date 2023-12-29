@@ -2,7 +2,7 @@ require("dotenv").config({ path: "./.env.local" });
 
 module.exports = () => ({
   expo: {
-    name: "GPXSpliceApp",
+    name: "GPX Splice",
     slug: "gpxsplice",
     version: "1.0.0",
     orientation: "portrait",
