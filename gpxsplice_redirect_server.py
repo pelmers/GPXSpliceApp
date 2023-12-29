@@ -108,11 +108,11 @@ class RedirectHandler(BaseHTTPRequestHandler):
                 self.wfile.write(res.encode('utf-8'))
                 return
 
+        logging.info(f"Redirecting to {client_uri}")
         # Encode the result in the redirect URL parameters
         client_uri += '?' + urllib.parse.urlencode({'payload': res})
         # And encode the original URL parameters as well
         client_uri += '&' + parsed_url.query
-        logging.info(f"Redirecting to {client_uri}")
         # Send a 302 redirect response
         self.send_response(302)
         self.send_header('Location', client_uri)

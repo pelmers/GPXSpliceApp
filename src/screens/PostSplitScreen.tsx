@@ -126,7 +126,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
                 </TouchableHighlight>
 
                 {/* <TouchableHighlight
-          underlayColor={colors.primary}
+                  underlayColor={colors.primary}
                   style={styles.uploadButton}
                   onPress={() => {
                     // TODO: Implement upload functionality

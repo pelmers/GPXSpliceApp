@@ -43,5 +43,7 @@ All screens are contained in [src/screens](src/screens), and other UI components
 
 ## Future work
 
-- Support for web platform
-- Look for TODO in the codebase
+- Support for web platform so you can use it as a website
+- Direct upload of results to Strava
+- Multiple split points (though you can do this today by doing split multiple times)
+- Look for other TODO in the codebase

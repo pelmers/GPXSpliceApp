@@ -1,4 +1,10 @@
 require("dotenv").config({ path: "./.env.local" });
+// If GOOGLE_MAPS_API_KEY is not set, show a warning
+if (!process.env.GOOGLE_MAPS_API_KEY) {
+  console.warn(
+    "GOOGLE_MAPS_API_KEY is not set. Map tiles will not load on Android. See README.md for more information."
+  );
+}
 
 module.exports = () => ({
   expo: {
@@ -10,7 +16,7 @@ module.exports = () => ({
     userInterfaceStyle: "light",
     entryPoint: "./src/App.js",
     scheme: "com.pelmers.gpxsplice",
-    assetBundlePatterns: ["**/*"],
+    assetBundlePatterns: ["**/*", "!examples/**/*"],
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.pelmers.gpxsplice",
