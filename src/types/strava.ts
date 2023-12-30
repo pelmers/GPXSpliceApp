@@ -1,5 +1,7 @@
 import { GpxPoint, pointsToGpx } from "../utils/gpx";
 
+import * as FileSystem from "expo-file-system";
+
 // incomplete, refer to https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities
 export type StravaActivity = { id: number } & Partial<{
   achievement_count: number;
@@ -129,8 +131,8 @@ export async function fetchStravaActivities(
 // Attempt to download a activity from strava, save it to a cache and return the uri
 // Strava doesn't give us a direct gpx file unless it was uploaded from a device in that format
 // Instead we can download all the streams and build our own gpx file
-// This function returns the gpx contents as a string.
-export async function fetchStravaActivityGpx(
+// This function saves the GPX file to cache and returns the path to the saved file on disk.
+export async function fetchStravaActivityGpxToDisk(
   activity: StravaActivity,
   accessToken: string,
 ): Promise<string> {
@@ -150,7 +152,13 @@ export async function fetchStravaActivityGpx(
     throw new Error(`${parsedResponse.message}, try logging in again`);
   }
   const streams = parsedResponse as StravaStream[];
-  return stravaStreamsToGpx(activity, streams);
+  const gpxContents = stravaStreamsToGpx(activity, streams);
+  if (FileSystem.cacheDirectory == null) {
+    throw new Error("FileSystem.cacheDirectory is null");
+  }
+  const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
+  await FileSystem.writeAsStringAsync(fileUri, gpxContents);
+  return fileUri;
 }
 
 function stravaStreamsToGpx(

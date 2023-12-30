@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
 
-import * as FileSystem from "expo-file-system";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { RootStackParamList } from "../routes";
-import { fetchStravaActivityGpx } from "../types/strava";
+import { fetchStravaActivityGpxToDisk } from "../types/strava";
 import { LoadingModal } from "../components/LoadingModal";
 import { StravaActivityList } from "../components/StravaActivityList";
 
@@ -28,17 +27,11 @@ export function StravaSplitActivitiesScreen({ navigation, route }: Props) {
           setLoadingModal(true);
           setError(null);
           try {
-            const gpxContents = await fetchStravaActivityGpx(
-              activity,
-              accessToken,
-            );
-            if (FileSystem.cacheDirectory == null) {
-              throw new Error("FileSystem.cacheDirectory is null");
-            }
-            const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
-            await FileSystem.writeAsStringAsync(fileUri, gpxContents);
             navigation.navigate("Split Map", {
-              gpxFileUri: fileUri,
+              gpxFileUri: await fetchStravaActivityGpxToDisk(
+                activity,
+                accessToken,
+              ),
             });
           } catch (e) {
             setError((e as Error).message);

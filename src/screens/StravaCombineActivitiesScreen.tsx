@@ -7,12 +7,11 @@ import {
   TouchableHighlight,
 } from "react-native";
 
-import * as FileSystem from "expo-file-system";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { colors } from "../utils/colors";
 import { RootStackParamList } from "../routes";
-import { StravaActivity, fetchStravaActivityGpx } from "../types/strava";
+import { StravaActivity, fetchStravaActivityGpxToDisk } from "../types/strava";
 import { LoadingModal } from "../components/LoadingModal";
 import { StravaActivityList } from "../components/StravaActivityList";
 
@@ -31,18 +30,9 @@ export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
     setError(null);
     try {
       const gpxFileUris = await Promise.all(
-        selectedActivities.map(async (activity) => {
-          const gpxContents = await fetchStravaActivityGpx(
-            activity,
-            accessToken,
-          );
-          if (FileSystem.cacheDirectory == null) {
-            throw new Error("FileSystem.cacheDirectory is null");
-          }
-          const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
-          await FileSystem.writeAsStringAsync(fileUri, gpxContents);
-          return fileUri;
-        }),
+        selectedActivities.map((activity) =>
+          fetchStravaActivityGpxToDisk(activity, accessToken),
+        ),
       );
       navigation.navigate("Combine Preview", {
         gpxFileUris,
