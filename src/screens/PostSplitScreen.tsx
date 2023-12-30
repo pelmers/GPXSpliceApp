@@ -100,7 +100,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
                 />
               </View>
               <GpxChartingModule
-                points={file.points}
+                gpxFile={file}
                 chartWidth={Dimensions.get("screen").width - 4}
                 chartHeight={180}
               />

@@ -130,7 +130,7 @@ export function GpxMapView({
       </View>
       <View style={styles.chartContainer}>
         <GpxChartingModule
-          points={gpx.points}
+          gpxFile={gpx}
           chartWidth={Dimensions.get("window").width - 4}
           chartHeight={200}
           splitData={splitData}

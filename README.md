@@ -1,6 +1,6 @@
-# GPX Splice
-
 [![Logo](assets/icon.png)](https://gpx.pelmers.com/)
+
+# GPX Splice
 
 ### The _easy_ way to split and combine your GPX files and Strava activities, from your phone!
 
@@ -11,7 +11,7 @@
 - Support GPX files and Strava activities
 - Split GPX files into multiple files
 - Combine multiple GPX files into one
-- Full mapping visualization and interactive stats charts
+- Full mapping visualization and interactive stats charts (elevation, speed, heart rate, etc.)
 - Settings for metric and imperial units
 - All processing stays on your phone
 
@@ -40,6 +40,10 @@ See **[my blog post](https://pelmers.com/TODO_LINK)** for a full technical write
 **Code**:
 Look at [src/App.tsx](src/App.tsx) for the main app entrypoint.
 All screens are contained in [src/screens](src/screens), and other UI components are in [src/components](src/components).
+
+_Note:_
+If you want to develop the Strava integration, you will need to register an app on Strava settings and deploy `gpxsplice_redirect_server.py` somewhere.
+However you most likely don't need to touch this if you're just trying to make a fix or new feature.
 
 ## Future work
 

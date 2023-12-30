@@ -6,7 +6,7 @@ import React, { useState, useMemo } from "react";
 import { StyleSheet, View, Text, TouchableHighlight } from "react-native";
 
 import { colors } from "../utils/colors";
-import { GpxPoint, calculateCumulativeDistance } from "../utils/gpx";
+import { GpxFile, GpxPoint, calculateCumulativeDistance } from "../utils/gpx";
 import { EasyLineChart } from "./EasyLineChart";
 import { useSettings } from "../utils/SettingsProvider";
 import {
@@ -18,7 +18,7 @@ import {
 } from "../types/settings";
 
 type Props = {
-  points: GpxPoint[];
+  gpxFile: GpxFile;
   chartHeight: number;
   chartWidth: number;
   splitData?: {
@@ -44,16 +44,16 @@ const ChartTypesArray: ChartType[] = [
   "temperature",
 ];
 
-function iconForType(chartType: ChartType) {
+function iconForType(chartType: ChartType, sportType: string) {
   switch (chartType) {
     case "elevation":
       return "🏔";
     case "speed":
-      return "💨";
+      return "🚀";
     case "heartrate":
       return "❤️";
     case "cadence":
-      return "👟";
+      return sportType.toLowerCase().indexOf("run") >= 0 ? "🏃‍♂️" : "🚴‍♂️";
     case "power":
       return "🔋";
     case "temperature":
@@ -153,14 +153,14 @@ function computeXYValues(
 
 function ChartButtonRow(props: {
   currentType: ChartType;
-  points: GpxPoint[];
+  gpxFile: GpxFile;
   onPress: (chartType: ChartType) => void;
 }) {
   return (
     <View style={styles.buttonRow}>
       {ChartTypesArray.map((type) => {
-        const enabled = enabledForType(type, props.points);
-        const icon = iconForType(type);
+        const enabled = enabledForType(type, props.gpxFile.points);
+        const icon = iconForType(type, props.gpxFile.type);
         return (
           <TouchableHighlight
             underlayColor={colors.primary}
@@ -174,7 +174,6 @@ function ChartButtonRow(props: {
                   ? styles.enabledButton
                   : styles.disabledButton,
             ]}
-            disabled={!enabled}
           >
             <Text style={styles.buttonText}>{icon}</Text>
           </TouchableHighlight>
@@ -199,32 +198,30 @@ function computeSplitPercent(
 export function GpxChartingModule(props: Props) {
   const [chartType, setChartType] = useState<ChartType>("elevation");
   const { settings } = useSettings();
+  const { gpxFile, splitData, chartHeight, chartWidth } = props;
   const { xValues, yValues } = useMemo(
-    () => computeXYValues(props.points, chartType, settings),
-    [props.points, chartType],
+    () => computeXYValues(gpxFile.points, chartType, settings),
+    [gpxFile, chartType],
   );
 
   const splitPercent =
-    props.splitData != null
-      ? computeSplitPercent(
-          props.splitData.cumulativeDistances,
-          props.splitData.index,
-        )
+    splitData != null
+      ? computeSplitPercent(splitData.cumulativeDistances, splitData.index)
       : null;
 
   const xUnits = settings.distanceUnit;
   const yUnits = yAxisUnitsForType(chartType, settings);
   const splitLabel =
-    props.splitData != null
-      ? `${yValues[props.splitData.index].toFixed(1)} ${yUnits}
-${xValues[props.splitData.index].toFixed(1)} ${xUnits}`
+    splitData != null
+      ? `${yValues[splitData.index].toFixed(1)} ${yUnits}
+${xValues[splitData.index].toFixed(1)} ${xUnits}`
       : null;
   // A row of buttons with icons, then a chart below and a split marker that follows the slider if given
   return (
     <View>
       <ChartButtonRow
         currentType={chartType}
-        points={props.points}
+        gpxFile={gpxFile}
         onPress={setChartType}
       />
       <View style={styles.chartContainer}>
@@ -233,15 +230,15 @@ ${xValues[props.splitData.index].toFixed(1)} ${xUnits}`
           yValues={yValues}
           yAxisUnits={yUnits}
           maxPoints={100}
-          width={props.chartWidth}
-          height={props.chartHeight}
+          width={chartWidth}
+          height={chartHeight}
         />
         {splitPercent != null && (
           // 64 and 16 are the margins of the chart axes, determined by inspection
           <View
             style={{
               position: "absolute",
-              left: 64 + (props.chartWidth - 64) * splitPercent,
+              left: 64 + (chartWidth - 64) * splitPercent,
               top: 32,
               bottom: 32,
               width: 2,

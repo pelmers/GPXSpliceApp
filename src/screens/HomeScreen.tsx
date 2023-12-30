@@ -46,7 +46,7 @@ export function HomeScreen({ navigation }: Props) {
       </View>
       <View style={styles.buttonBackground}>
         <TouchableHighlight
-          underlayColor={colors.secondary}
+          underlayColor={colors.primary}
           onPress={() => {
             navigation.navigate("Split");
           }}
