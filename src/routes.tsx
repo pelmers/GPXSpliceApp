@@ -8,7 +8,6 @@ export type RootStackParamList = {
   Combine: undefined;
   "Combine Preview": {
     gpxFileUris: string[];
-    stravaAccessToken?: string;
   };
   "Combine (Strava)": {
     accessToken: string;
@@ -20,10 +19,8 @@ export type RootStackParamList = {
   };
   "Split Map": {
     gpxFileUri: string;
-    stravaAccessToken?: string;
   };
   "Post Split": {
-    stravaAccessToken?: string;
     splitIndex: number;
     gpxFileUri: string;
   };

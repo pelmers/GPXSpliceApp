@@ -39,7 +39,6 @@ export function StravaSplitActivitiesScreen({ navigation, route }: Props) {
             await FileSystem.writeAsStringAsync(fileUri, gpxContents);
             navigation.navigate("Split Map", {
               gpxFileUri: fileUri,
-              stravaAccessToken: accessToken,
             });
           } catch (e) {
             setError((e as Error).message);

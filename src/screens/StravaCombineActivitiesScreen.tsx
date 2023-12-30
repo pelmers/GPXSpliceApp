@@ -46,7 +46,6 @@ export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
       );
       navigation.navigate("Combine Preview", {
         gpxFileUris,
-        stravaAccessToken: accessToken,
       });
     } catch (e) {
       setError((e as Error).message);

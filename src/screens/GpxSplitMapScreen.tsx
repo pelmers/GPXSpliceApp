@@ -20,7 +20,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
   const [gpx, setGpx] = useState<GpxFile | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const { gpxFileUri, stravaAccessToken } = route.params;
+  const { gpxFileUri } = route.params;
   // Read the gpx file on mount
   useEffect(() => {
     async function readGpxFile() {
@@ -61,7 +61,6 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
         navigation.navigate("Post Split", {
           gpxFileUri,
           splitIndex: sliderIndex,
-          stravaAccessToken,
         });
       }}
     />

@@ -28,7 +28,7 @@ export function CombinePreviewScreen({ navigation, route }: Props) {
   const [gpx, setGpx] = useState<GpxFile | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const { gpxFileUris, stravaAccessToken } = route.params;
+  const { gpxFileUris } = route.params;
   // Read the gpx file on mount
   useEffect(() => {
     async function readGpxFiles() {

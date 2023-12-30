@@ -44,7 +44,9 @@ function EasyLineChart_(props: Props) {
   let resampledXValues = resample(xValues, maxPoints);
   let resampledYValues = resample(yValues, maxPoints);
   if (resampledXValues.length < 2) {
-    console.log("Not enough data to display chart?");
+    console.log(
+      `Not enough data to display chart? (${resampledXValues.length}))`,
+    );
     return null;
   }
 

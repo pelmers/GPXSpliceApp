@@ -164,6 +164,7 @@ function ChartButtonRow(props: {
         return (
           <TouchableHighlight
             underlayColor={colors.primary}
+            disabled={!enabled}
             key={type}
             onPress={() => props.onPress(type)}
             style={[

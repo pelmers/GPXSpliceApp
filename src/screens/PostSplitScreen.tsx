@@ -37,7 +37,7 @@ async function writeFile(file: GpxFile): Promise<string> {
 }
 
 export function PostSplitScreen({ navigation, route }: Props) {
-  const { gpxFileUri, splitIndex, stravaAccessToken } = route.params;
+  const { gpxFileUri, splitIndex } = route.params;
 
   // Actually do the split, first pop up a loading indicator
   const [loading, setLoading] = useState(true);
