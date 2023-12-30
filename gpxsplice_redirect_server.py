@@ -70,13 +70,14 @@ class RedirectHandler(BaseHTTPRequestHandler):
         # Parse the URL and parameters
         parsed_url = urlparse(self.path)
         params = parse_qs(parsed_url.query)
-        if 'client_uri' not in params:
+        if not self.path.startswith('/client_uri'):
             logging.error(f"Missing client_uri in request: {self.path}")
             self.send_response(400)
             self.end_headers()
             return
 
-        client_uri = params['client_uri'][0]
+        # Decode everything after the /client_uri/ as the client uri
+        client_uri = urllib.parse.unquote(parsed_url.path.split('/')[2])
 
         # Perform key exchange with the Strava API by sending the code with client id and secret
         if 'code' not in params:

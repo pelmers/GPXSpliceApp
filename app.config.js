@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "./.env.local" });
+require("dotenv").config({ path: ".env.local" });
 // If GOOGLE_MAPS_API_KEY is not set, show a warning
 if (!process.env.GOOGLE_MAPS_API_KEY) {
   console.warn(
@@ -17,13 +17,21 @@ module.exports = () => ({
     entryPoint: "./src/App.js",
     scheme: "com.pelmers.gpxsplice",
     assetBundlePatterns: ["**/*", "!examples/**/*"],
+    splash: {
+      image: './assets/splash.png',
+      resizeMode: 'contain',
+      backgroundColor: '#523C8F',
+    },
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.pelmers.gpxsplice",
     },
     android: {
       package: "com.pelmers.gpxsplice",
-      intentFilters: [],
+      adaptiveIcon: {
+        foregroundImage: './assets/adaptive-foreground.png',
+        backgroundColor: '#523C8F',
+      },
       config: {
         googleMaps: {
           // TODO: protect the api key in google maps console https://console.cloud.google.com/google/maps-apis/credentials?project=gpxsplice
