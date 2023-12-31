@@ -49,5 +49,6 @@ However you most likely don't need to touch this if you're just trying to make a
 ## Future work
 
 - Support for web platform so you can use it as a website
+- Allow upload to Strava even if you did not log in with Strava to fetch activities
 - Multiple split points (though you can do this today by doing split multiple times)
 - Look for other TODO in the codebase
