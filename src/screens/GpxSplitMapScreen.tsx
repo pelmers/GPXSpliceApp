@@ -55,13 +55,13 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
   return (
     <GpxMapView
       gpx={gpx}
-      showSlider={true}
-      pressableLabel="SPLIT"
-      onPressablePress={(sliderIndex) => {
-        navigation.navigate("Post Split", {
-          gpxFileUri,
-          splitIndex: sliderIndex,
-        });
+      sliderOptions={{
+        onSplitPress: (sliderIndex) => {
+          navigation.navigate("Post Split", {
+            gpxFileUri,
+            splitIndex: sliderIndex,
+          });
+        },
       }}
     />
   );

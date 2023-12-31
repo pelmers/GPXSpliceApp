@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ActivityIndicator,
+  TouchableHighlight,
+} from "react-native";
 
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
@@ -87,21 +93,29 @@ export function CombinePreviewScreen({ navigation, route }: Props) {
   return (
     <GpxMapView
       gpx={gpx}
-      showSlider={false}
-      pressableLabel="💾 EXPORT"
-      onPressablePress={async () => {
-        try {
-          const path = await writeFile(gpx);
-          await Sharing.shareAsync(path, {
-            mimeType: "application/gpx+xml",
-            dialogTitle: "Share GPX File",
-            UTI: "com.topografix.gpx",
-          });
-        } catch (e) {
-          console.error(e);
-          setError((e as Error).message);
-        }
-      }}
+      buttonRow={
+        <View style={styles.buttonRow}>
+          <TouchableHighlight
+            underlayColor={colors.primary}
+            onPress={async () => {
+              try {
+                const path = await writeFile(gpx);
+                await Sharing.shareAsync(path, {
+                  mimeType: "application/gpx+xml",
+                  dialogTitle: "Share GPX File",
+                  UTI: "com.topografix.gpx",
+                });
+              } catch (e) {
+                console.error(e);
+                setError((e as Error).message);
+              }
+            }}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>💾 EXPORT</Text>
+          </TouchableHighlight>
+        </View>
+      }
     />
   );
 }
@@ -116,5 +130,23 @@ const styles = StyleSheet.create({
   titleText: {
     color: colors.light,
     fontSize: 18,
+  },
+  buttonRow: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  button: {
+    backgroundColor: colors.accent,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginHorizontal: 15,
+  },
+  buttonText: {
+    fontFamily: "BebasNeue-Regular",
+    fontSize: 24,
+    color: colors.light,
   },
 });

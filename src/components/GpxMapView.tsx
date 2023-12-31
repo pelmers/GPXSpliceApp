@@ -20,19 +20,15 @@ import { GpxChartingModule } from "./GpxChartingModule";
 
 type Props = {
   gpx: GpxFile;
-  showSlider: boolean;
-  pressableLabel: string;
-  onPressablePress: (sliderIndex: number) => unknown;
+  sliderOptions?: {
+    onSplitPress: (sliderIndex: number) => unknown;
+  };
+  buttonRow?: React.ReactNode;
 };
 
 // MapView usage docs: https://docs.expo.dev/versions/latest/sdk/map-view/
 
-export function GpxMapView({
-  gpx,
-  showSlider,
-  pressableLabel,
-  onPressablePress,
-}: Props) {
+export function GpxMapView({ gpx, sliderOptions, buttonRow }: Props) {
   const [sliderValue, setSliderValue] = useState(0);
   const [distances, setDistances] = useState<number[]>([]);
 
@@ -46,13 +42,11 @@ export function GpxMapView({
     Math.floor(sliderValue * gpx.points.length),
     gpx.points.length - 1,
   );
-  const splitData =
-    distances.length > 0 && showSlider
-      ? {
-          index: sliderIndex,
-          cumulativeDistances: distances,
-        }
-      : undefined;
+  const showSlider = sliderOptions != null;
+  const splitData = distances.length > 0 && {
+    index: sliderIndex,
+    cumulativeDistances: distances,
+  };
 
   return (
     <View style={styles.container}>
@@ -107,8 +101,8 @@ export function GpxMapView({
           strokeWidth={5}
         />
       </MapView>
-      <View style={styles.splitSliderContainer}>
-        {showSlider && (
+      {showSlider && (
+        <View style={styles.splitSliderContainer}>
           <Slider
             style={{ flex: 5, marginHorizontal: 14 }}
             minimumValue={0}
@@ -117,23 +111,24 @@ export function GpxMapView({
             maximumTrackTintColor={colors.accent}
             onValueChange={(value) => setSliderValue(value)}
           />
-        )}
-        <TouchableHighlight
-          underlayColor={colors.primary}
-          onPress={async () => {
-            await onPressablePress(sliderIndex);
-          }}
-          style={styles.splitButton}
-        >
-          <Text style={styles.splitButtonText}>{pressableLabel}</Text>
-        </TouchableHighlight>
-      </View>
+          <TouchableHighlight
+            underlayColor={colors.primary}
+            onPress={async () => {
+              await sliderOptions?.onSplitPress(sliderIndex);
+            }}
+            style={styles.splitButton}
+          >
+            <Text style={styles.splitButtonText}>SPLIT</Text>
+          </TouchableHighlight>
+        </View>
+      )}
+      {buttonRow}
       <View style={styles.chartContainer}>
         <GpxChartingModule
           gpxFile={gpx}
           chartWidth={Dimensions.get("window").width - 4}
           chartHeight={200}
-          splitData={splitData}
+          splitData={splitData || undefined}
         />
       </View>
     </View>

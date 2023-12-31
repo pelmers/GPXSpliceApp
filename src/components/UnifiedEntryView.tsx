@@ -14,7 +14,11 @@ import * as AuthSession from "expo-auth-session";
 import * as Linking from "expo-linking";
 
 import { colors } from "../utils/colors";
-import { STRAVA_AUTH_ENDPOINT, CLIENT_ID, REDIRECT_SERVER_URL } from "../utils/client";
+import {
+  STRAVA_AUTH_ENDPOINT,
+  CLIENT_ID,
+  REDIRECT_SERVER_URL,
+} from "../utils/client";
 import { StravaAthlete } from "../types/strava";
 
 export async function getGpxFileUris(options: {
@@ -63,10 +67,9 @@ export function UnifiedEntryScreen(props: Props) {
   // I originally encoded the client uri as a query param, but for some reason this was getting
   // dropped when going through Strava's app-based mobile auth (though worked on the web version)
   // Instead we encode it in the path itself, after the client_uri part (which the server knows)
-  const redirectUri = new URL(`${REDIRECT_SERVER_URL}/client_uri/${encodeURIComponent(clientUri)}`);
-
-  // log redirect uri
-  console.log(redirectUri.toString());
+  const redirectUri = new URL(
+    `${REDIRECT_SERVER_URL}/client_uri/${encodeURIComponent(clientUri)}`,
+  );
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {

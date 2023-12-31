@@ -18,9 +18,9 @@ module.exports = () => ({
     scheme: "com.pelmers.gpxsplice",
     assetBundlePatterns: ["**/*", "!examples/**/*"],
     splash: {
-      image: './assets/splash.png',
-      resizeMode: 'contain',
-      backgroundColor: '#523C8F',
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#523C8F",
     },
     ios: {
       supportsTablet: true,
@@ -29,8 +29,8 @@ module.exports = () => ({
     android: {
       package: "com.pelmers.gpxsplice",
       adaptiveIcon: {
-        foregroundImage: './assets/adaptive-foreground.png',
-        backgroundColor: '#523C8F',
+        foregroundImage: "./assets/adaptive-foreground.png",
+        backgroundColor: "#523C8F",
       },
       config: {
         googleMaps: {
