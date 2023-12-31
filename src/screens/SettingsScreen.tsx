@@ -12,7 +12,7 @@ import {
   TEMP_UNITS,
   ELEVATION_UNITS,
 } from "../types/settings";
-import { useSettings } from "../utils/SettingsProvider";
+import { useSettings } from "../providers/SettingsProvider";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 

@@ -9,14 +9,8 @@ export type RootStackParamList = {
   "Combine Preview": {
     gpxFileUris: string[];
   };
-  "Combine (Strava)": {
-    accessToken: string;
-    athlete: StravaAthlete;
-  };
-  "Split (Strava)": {
-    accessToken: string;
-    athlete: StravaAthlete;
-  };
+  "Combine (Strava)": undefined;
+  "Split (Strava)": undefined;
   "Split Map": {
     gpxFileUri: string;
   };

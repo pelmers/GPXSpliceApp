@@ -7,11 +7,11 @@ import { RootStackParamList } from "../routes";
 import { fetchStravaActivityGpxToDisk } from "../types/strava";
 import { LoadingModal } from "../components/LoadingModal";
 import { StravaActivityList } from "../components/StravaActivityList";
+import { useStravaToken } from "../providers/StravaTokenProvider";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Split (Strava)">;
 
 export function StravaSplitActivitiesScreen({ navigation, route }: Props) {
-  const { accessToken, athlete } = route.params;
   const [loadingModal, setLoadingModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,13 +20,14 @@ export function StravaSplitActivitiesScreen({ navigation, route }: Props) {
       <LoadingModal visible={loadingModal} />
       {error && <Text style={styles.errorText}>{error}</Text>}
       <StravaActivityList
-        accessToken={accessToken}
-        athlete={athlete}
         instructionText="Press an activity to split"
-        onActivityPress={async (activity) => {
+        onActivityPress={async (activity, accessToken) => {
           setLoadingModal(true);
           setError(null);
           try {
+            if (accessToken === null) {
+              throw new Error("No Strava access token to download activity");
+            }
             navigation.navigate("Split Map", {
               gpxFileUri: await fetchStravaActivityGpxToDisk(
                 activity,

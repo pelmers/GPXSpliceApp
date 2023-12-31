@@ -9,7 +9,7 @@ import {
   SettingsContext,
   SettingsContextType,
   useSettings,
-} from "../utils/SettingsProvider";
+} from "../providers/SettingsProvider";
 import { convert } from "../types/settings";
 
 // See full list at https://developers.strava.com/docs/reference/#api-models-SportType

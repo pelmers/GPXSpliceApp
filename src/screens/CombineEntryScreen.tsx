@@ -13,12 +13,7 @@ export function CombineEntryScreen({ navigation }: Props) {
   return (
     <UnifiedEntryScreen
       title="Combine GPX files"
-      onAuthSuccess={(accessToken, athlete) => {
-        navigation.navigate("Combine (Strava)", {
-          accessToken,
-          athlete,
-        });
-      }}
+      onAuthSuccess={() => navigation.navigate("Combine (Strava)")}
       onSelectPress={async () => {
         const fileUris = await getGpxFileUris({ multiple: true });
         navigation.navigate("Combine Preview", { gpxFileUris: fileUris });

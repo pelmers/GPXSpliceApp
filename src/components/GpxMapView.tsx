@@ -43,10 +43,11 @@ export function GpxMapView({ gpx, sliderOptions, buttonRow }: Props) {
     gpx.points.length - 1,
   );
   const showSlider = sliderOptions != null;
-  const splitData = distances.length > 0 && {
-    index: sliderIndex,
-    cumulativeDistances: distances,
-  };
+  const splitData = distances.length > 0 &&
+    showSlider && {
+      index: sliderIndex,
+      cumulativeDistances: distances,
+    };
 
   return (
     <View style={styles.container}>

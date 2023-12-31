@@ -7,34 +7,18 @@ import {
   Text,
   ActivityIndicator,
   Dimensions,
-  Pressable,
   ScrollView,
-  TouchableHighlight,
 } from "react-native";
 import * as FileSystem from "expo-file-system";
-import * as Sharing from "expo-sharing";
 
 import { RootStackParamList } from "../routes";
 import { colors } from "../utils/colors";
-import {
-  GpxFile,
-  gpxSummaryStats,
-  parseGpxFile,
-  pointsToGpx,
-} from "../utils/gpx";
+import { GpxFile, gpxSummaryStats, parseGpxFile } from "../utils/gpx";
 import { GpxChartingModule } from "../components/GpxChartingModule";
 import { ActivityInfoFragment } from "../components/ActivityInfoFragment";
+import { ExportButtonRow } from "../components/ExportButtonRow";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Post Split">;
-
-async function writeFile(file: GpxFile): Promise<string> {
-  const serializedGpxFileString = pointsToGpx(file);
-  const path = `${FileSystem.documentDirectory}${encodeURIComponent(
-    file.name,
-  )}.gpx`;
-  await FileSystem.writeAsStringAsync(path, serializedGpxFileString);
-  return path;
-}
 
 export function PostSplitScreen({ navigation, route }: Props) {
   const { gpxFileUri, splitIndex } = route.params;
@@ -104,39 +88,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
                 chartWidth={Dimensions.get("screen").width - 4}
                 chartHeight={180}
               />
-              <View style={styles.actionButtonsContainer}>
-                <TouchableHighlight
-                  underlayColor={colors.primary}
-                  style={styles.exportButton}
-                  onPress={async () => {
-                    try {
-                      const path = await writeFile(file);
-                      await Sharing.shareAsync(path, {
-                        mimeType: "application/gpx+xml",
-                        dialogTitle: "Share GPX File",
-                        UTI: "com.topografix.gpx",
-                      });
-                    } catch (e) {
-                      console.error(e);
-                      setError((e as Error).message);
-                    }
-                  }}
-                >
-                  <Text style={styles.buttonText}>💾 Export</Text>
-                </TouchableHighlight>
-
-                {/* <TouchableHighlight
-                  underlayColor={colors.primary}
-                  style={styles.uploadButton}
-                  onPress={() => {
-                    // TODO: Implement upload functionality
-                    console.log(`Uploading ${file.name}`);
-                    Alert.alert("Not implemented yet");
-                  }}
-                >
-                  <Text style={styles.buttonText}>⬆️ Upload</Text>
-                </TouchableHighlight> */}
-              </View>
+              <ExportButtonRow gpx={file} onError={setError} />
               <View
                 style={{
                   borderBottomColor: colors.light,

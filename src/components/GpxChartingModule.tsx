@@ -8,7 +8,7 @@ import { StyleSheet, View, Text, TouchableHighlight } from "react-native";
 import { colors } from "../utils/colors";
 import { GpxFile, GpxPoint, calculateCumulativeDistance } from "../utils/gpx";
 import { EasyLineChart } from "./EasyLineChart";
-import { useSettings } from "../utils/SettingsProvider";
+import { useSettings } from "../providers/SettingsProvider";
 import {
   ELEVATION_UNITS,
   SPEED_UNITS,

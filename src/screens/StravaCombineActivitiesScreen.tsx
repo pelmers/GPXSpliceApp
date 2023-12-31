@@ -18,9 +18,9 @@ import { StravaActivityList } from "../components/StravaActivityList";
 type Props = NativeStackScreenProps<RootStackParamList, "Combine (Strava)">;
 
 export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
-  const { accessToken, athlete } = route.params;
   const [loadingModal, setLoadingModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [selectedActivities, setSelectedActivities] = useState<
     StravaActivity[]
   >([]);
@@ -31,7 +31,7 @@ export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
     try {
       const gpxFileUris = await Promise.all(
         selectedActivities.map((activity) =>
-          fetchStravaActivityGpxToDisk(activity, accessToken),
+          fetchStravaActivityGpxToDisk(activity, accessToken!),
         ),
       );
       navigation.navigate("Combine Preview", {
@@ -49,11 +49,10 @@ export function StravaCombineActivitiesScreen({ navigation, route }: Props) {
       <LoadingModal visible={loadingModal} />
       {error && <Text style={styles.errorText}>{error}</Text>}
       <StravaActivityList
-        athlete={athlete}
-        accessToken={accessToken}
         selectedActivities={selectedActivities}
         instructionText={"Select multiple activities to combine"}
-        onActivityPress={(activity) => {
+        onActivityPress={(activity, accessToken) => {
+          setAccessToken(accessToken);
           // Append to selected list, or remove if already selected
           if (selectedActivities.includes(activity)) {
             setSelectedActivities((prevActivities) =>

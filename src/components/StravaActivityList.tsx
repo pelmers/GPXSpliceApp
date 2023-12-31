@@ -15,8 +15,12 @@ import {
   fetchStravaActivities,
 } from "../types/strava";
 import { StravaActivityRow } from "./StravaActivityRow";
+import { useStravaToken } from "../providers/StravaTokenProvider";
 
-function displayAthlete(athlete: StravaAthlete) {
+function displayAthlete(athlete?: StravaAthlete) {
+  if (!athlete) {
+    return null;
+  }
   // Render a banner that shows information about the logged in athlete
   // On the left a profile picture, on the right two lines: name and location
   const name = athlete.firstname + " " + athlete.lastname;
@@ -39,21 +43,13 @@ function displayAthlete(athlete: StravaAthlete) {
 }
 
 type Props = {
-  accessToken: string;
-  athlete: StravaAthlete;
-  onActivityPress: (activity: StravaActivity) => void;
+  onActivityPress: (activity: StravaActivity, accessToken: string) => void;
   instructionText: string;
   selectedActivities?: StravaActivity[];
 };
 
 export function StravaActivityList(props: Props) {
-  const {
-    accessToken,
-    athlete,
-    onActivityPress,
-    selectedActivities,
-    instructionText,
-  } = props;
+  const { onActivityPress, selectedActivities, instructionText } = props;
   const [loadingInline, setLoadingInline] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activities, setActivities] = useState<StravaActivity[]>([]);
@@ -61,20 +57,29 @@ export function StravaActivityList(props: Props) {
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
 
+  const { stravaToken } = useStravaToken();
+  if (stravaToken === null) {
+    setError("No Strava token found");
+  }
+  const { accessToken, athlete } = stravaToken || {};
+
   useEffect(() => {
     loadActivities();
-  }, [accessToken, page]);
+  }, [stravaToken, page]);
 
   const loadActivities = async () => {
     setLoadingInline(true);
     setError(null);
     try {
+      if (!accessToken) {
+        return;
+      }
       const newActivities = await fetchStravaActivities(accessToken, page);
       setActivities((prevActivities) => [...prevActivities, ...newActivities]);
-      setLoadingInline(false);
     } catch (error) {
       console.error(error);
       setError((error as Error).message);
+    } finally {
       setLoadingInline(false);
     }
   };
@@ -108,7 +113,7 @@ export function StravaActivityList(props: Props) {
             activity={activity}
             selected={(selectedActivities || []).includes(activity)}
             onPress={(activity) => {
-              onActivityPress(activity);
+              onActivityPress(activity, accessToken!);
             }}
           />
         )}

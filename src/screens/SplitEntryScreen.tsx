@@ -13,12 +13,7 @@ export function SplitEntryScreen({ navigation }: Props) {
   return (
     <UnifiedEntryScreen
       title="Split GPX files"
-      onAuthSuccess={(accessToken, athlete) => {
-        navigation.navigate("Split (Strava)", {
-          accessToken,
-          athlete,
-        });
-      }}
+      onAuthSuccess={() => navigation.navigate("Split (Strava)")}
       onSelectPress={async () => {
         const [fileUri] = await getGpxFileUris({ multiple: false });
         navigation.navigate("Split Map", { gpxFileUri: fileUri });

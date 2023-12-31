@@ -20,6 +20,7 @@ import {
   REDIRECT_SERVER_URL,
 } from "../utils/client";
 import { StravaAthlete } from "../types/strava";
+import { useStravaToken } from "../providers/StravaTokenProvider";
 
 export async function getGpxFileUris(options: {
   multiple: boolean;
@@ -51,12 +52,14 @@ export async function getGpxFileUris(options: {
 
 type Props = {
   title: string;
-  onAuthSuccess: (accessToken: string, athlete: StravaAthlete) => void;
+  onAuthSuccess: () => void;
   onSelectPress: () => unknown;
 };
 
 export function UnifiedEntryScreen(props: Props) {
   const [error, setError] = useState<string | null>(null);
+
+  const { setStravaToken } = useStravaToken();
 
   // The client uri defines a uri that will come back to this screen when it's opened on the client
   const clientUri = AuthSession.makeRedirectUri({
@@ -94,14 +97,12 @@ export function UnifiedEntryScreen(props: Props) {
     if (payload) {
       const payloadObj = JSON.parse(decodeURIComponent(payload as string));
       const accessToken = payloadObj.access_token;
-      if (scope && !scope.includes("activity:write")) {
-        // TODO Alert uncomment alert below when we implement upload
-        // Alert.alert(
-        //   "Warning",
-        //   "Without write permission, I cannot help you upload activities after splitting!",
-        // );
-      }
-      props.onAuthSuccess(accessToken, payloadObj.athlete);
+      setStravaToken({
+        accessToken,
+        athlete: payloadObj.athlete as StravaAthlete,
+        scope: scope as string,
+      });
+      props.onAuthSuccess();
     } else {
       const errorDescription = parsed.error_description;
       if (errorDescription) {

@@ -18,17 +18,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
 import { GpxFile, parseGpxFile, pointsToGpx } from "../utils/gpx";
 import { GpxMapView } from "../components/GpxMapView";
+import { ExportButtonRow } from "../components/ExportButtonRow";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Combine Preview">;
-
-async function writeFile(file: GpxFile): Promise<string> {
-  const serializedGpxFileString = pointsToGpx(file);
-  const path = `${FileSystem.documentDirectory}${encodeURIComponent(
-    file.name,
-  )}.gpx`;
-  await FileSystem.writeAsStringAsync(path, serializedGpxFileString);
-  return path;
-}
 
 export function CombinePreviewScreen({ navigation, route }: Props) {
   const [gpx, setGpx] = useState<GpxFile | null>(null);
@@ -93,29 +85,7 @@ export function CombinePreviewScreen({ navigation, route }: Props) {
   return (
     <GpxMapView
       gpx={gpx}
-      buttonRow={
-        <View style={styles.buttonRow}>
-          <TouchableHighlight
-            underlayColor={colors.primary}
-            onPress={async () => {
-              try {
-                const path = await writeFile(gpx);
-                await Sharing.shareAsync(path, {
-                  mimeType: "application/gpx+xml",
-                  dialogTitle: "Share GPX File",
-                  UTI: "com.topografix.gpx",
-                });
-              } catch (e) {
-                console.error(e);
-                setError((e as Error).message);
-              }
-            }}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>💾 EXPORT</Text>
-          </TouchableHighlight>
-        </View>
-      }
+      buttonRow={<ExportButtonRow gpx={gpx} onError={setError} />}
     />
   );
 }
@@ -130,23 +100,5 @@ const styles = StyleSheet.create({
   titleText: {
     color: colors.light,
     fontSize: 18,
-  },
-  buttonRow: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: colors.accent,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginHorizontal: 15,
-  },
-  buttonText: {
-    fontFamily: "BebasNeue-Regular",
-    fontSize: 24,
-    color: colors.light,
   },
 });
