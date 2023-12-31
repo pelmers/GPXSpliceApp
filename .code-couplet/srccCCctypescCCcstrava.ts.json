@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "comments": [
+    {
+      "commentRange": {
+        "start": {
+          "line": 275,
+          "char": 42
+        },
+        "end": {
+          "line": 275,
+          "char": 44
+        }
+      },
+      "codeRange": {
+        "start": {
+          "line": 247,
+          "char": 21
+        },
+        "end": {
+          "line": 247,
+          "char": 23
+        }
+      },
+      "codeRelativePath": "",
+      "commentValue": "30",
+      "codeValue": "30",
+      "id": 0
+    }
+  ],
+  "configuration": {
+    "lineComment": "//"
+  }
+}

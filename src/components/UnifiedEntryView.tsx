@@ -21,6 +21,7 @@ import {
 } from "../utils/client";
 import { StravaAthlete } from "../types/strava";
 import { useStravaToken } from "../providers/StravaTokenProvider";
+import { Alert } from "react-native";
 
 export async function getGpxFileUris(options: {
   multiple: boolean;
@@ -77,9 +78,7 @@ export function UnifiedEntryScreen(props: Props) {
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: CLIENT_ID,
-      scopes: ["activity:read_all"],
-      // TODO ask for write when we implement upload, btw scopes needs to be a single string
-      // scopes: ["activity:read_all,activity:write"],
+      scopes: ["activity:read_all,activity:write"],
       redirectUri: redirectUri.toString(),
     },
     {
@@ -102,6 +101,19 @@ export function UnifiedEntryScreen(props: Props) {
         athlete: payloadObj.athlete as StravaAthlete,
         scope: scope as string,
       });
+      if (scope?.indexOf("activity:write") === -1) {
+        // Show an alert that upload will not work
+        Alert.alert(
+          "Upload not enabled",
+          "You can export results to file, but upload will not work.",
+          [
+            {
+              text: "OK",
+              onPress: () => {},
+            },
+          ],
+        );
+      }
       props.onAuthSuccess();
     } else {
       const errorDescription = parsed.error_description;

@@ -1,4 +1,4 @@
-import { GpxPoint, pointsToGpx } from "../utils/gpx";
+import { GpxFile, GpxPoint, pointsToGpx } from "../utils/gpx";
 
 import * as FileSystem from "expo-file-system";
 
@@ -107,6 +107,16 @@ export type StravaStream =
       series_type: string;
     });
 
+export type StravaUploadResult = {
+  id_str: string;
+  activity_id: number;
+  external_id: string;
+  id: number;
+  error: string;
+  status: string;
+  message?: string;
+};
+
 export async function fetchStravaActivities(
   accessToken: string,
   page: number = 1,
@@ -126,6 +136,18 @@ export async function fetchStravaActivities(
     throw new Error(json.errors[0].message);
   }
   return json;
+}
+
+async function writeGpxToCache(
+  id: number,
+  gpxContents: string,
+): Promise<string> {
+  if (FileSystem.cacheDirectory == null) {
+    throw new Error("FileSystem.cacheDirectory is null");
+  }
+  const fileUri = `${FileSystem.cacheDirectory}/activity-${id}.gpx`;
+  await FileSystem.writeAsStringAsync(fileUri, gpxContents);
+  return fileUri;
 }
 
 // Attempt to download a activity from strava, save it to a cache and return the uri
@@ -153,12 +175,7 @@ export async function fetchStravaActivityGpxToDisk(
   }
   const streams = parsedResponse as StravaStream[];
   const gpxContents = stravaStreamsToGpx(activity, streams);
-  if (FileSystem.cacheDirectory == null) {
-    throw new Error("FileSystem.cacheDirectory is null");
-  }
-  const fileUri = `${FileSystem.cacheDirectory}/activity-${activity.id}.gpx`;
-  await FileSystem.writeAsStringAsync(fileUri, gpxContents);
-  return fileUri;
+  return await writeGpxToCache(activity.id, gpxContents);
 }
 
 function stravaStreamsToGpx(
@@ -181,7 +198,7 @@ function stravaStreamsToGpx(
       if (s.type === "time") {
         // Strava stream gives back seconds since the start. We want to save as ISO string so need to add to the start date
         point.time = new Date(
-          start_date.getTime() + s.data[i] * 1000,
+          start_date.getTime() + s.data[i] * 1000 - 200000,
         ).toISOString();
       } else {
         point[s.type] = s.data[i];
@@ -195,4 +212,72 @@ function stravaStreamsToGpx(
     name: name ?? "Unnamed Activity",
     type: type ?? "UnknownSport",
   });
+}
+
+export async function uploadActivity(
+  accessToken: string,
+  gpx: GpxFile,
+): Promise<StravaUploadResult> {
+  const data = new FormData();
+  const externalId = `gpxsplice-${Date.now()}`;
+
+  // @ts-ignore difference between React Native fetch and browser fetch
+  data.append("file", {
+    uri: await writeGpxToCache(Date.now(), pointsToGpx(gpx)),
+    type: "application/gpx+xml",
+    name: gpx.name,
+  });
+
+  data.append("name", gpx.name);
+  data.append("external_id", externalId);
+  data.append("description", "Uploaded from GPX Splice");
+  data.append("data_type", "gpx");
+
+  const request = new Request("https://www.strava.com/api/v3/uploads", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: data,
+  });
+
+  const uploadResponse = await fetch(request);
+  const responseJson: StravaUploadResult = await uploadResponse.json();
+
+  if (responseJson.error || responseJson.message) {
+    const error = responseJson.error || responseJson.message;
+    throw new Error(error);
+  }
+
+  const { id } = responseJson;
+
+  const retryLimit = 30;
+  const retryInterval = 1000;
+  let retryCount = 0;
+  while (retryCount < retryLimit) {
+    const statusResponse = await fetch(
+      `https://www.strava.com/api/v3/uploads/${id}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    const statusJson: StravaUploadResult = await statusResponse.json();
+
+    if (statusJson.error || statusJson.message) {
+      const error = statusJson.error || statusJson.message;
+      throw new Error(error);
+    }
+
+    if (statusJson.status === "Your activity is ready.") {
+      return statusJson;
+    }
+    await new Promise((resolve) => setTimeout(resolve, retryInterval));
+    retryCount++;
+  }
+
+  throw new Error("Upload timed out after 30 seconds");
 }

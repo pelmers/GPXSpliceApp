@@ -14,6 +14,7 @@
 - Full mapping visualization and interactive stats charts (elevation, speed, heart rate, etc.)
 - Settings for metric and imperial units
 - All processing stays on your phone
+- Direct upload of results to Strava
 
 ## Examples
 
@@ -48,6 +49,5 @@ However you most likely don't need to touch this if you're just trying to make a
 ## Future work
 
 - Support for web platform so you can use it as a website
-- Direct upload of results to Strava
 - Multiple split points (though you can do this today by doing split multiple times)
 - Look for other TODO in the codebase
