@@ -95,7 +95,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
                   borderBottomWidth: 1,
                   opacity: 0.2,
                   marginHorizontal: 100,
-                  marginTop: 10,
+                  marginVertical: 8,
                 }}
               ></View>
             </View>

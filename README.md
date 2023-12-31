@@ -1,6 +1,13 @@
-[![Logo](assets/icon.png)](https://gpx.pelmers.com/)
+<div align="center">
+ 
+![](examples/gpx_splice_split_demo.gif)
+
+<a href="App store link"><img src="examples/ios-store-button.png" height="50"></a>
+<a href="Play store link"><img src="examples/android-store-button.png" height="50"></a>
 
 # GPX Splice
+
+</div>
 
 ### The _easy_ way to split and combine your GPX files and Strava activities, from your phone!
 

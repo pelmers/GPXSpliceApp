@@ -78,7 +78,7 @@ export function ExportButtonRow(props: Props) {
           stravaToken!.accessToken,
           gpx,
         );
-        setActivityId(uploadResponse.id);
+        setActivityId(uploadResponse.activity_id);
       } catch (e) {
         console.error(e);
         onError((e as Error).message);
