@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
-  Pressable,
   Text,
   Platform,
   TouchableHighlight,

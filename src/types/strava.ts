@@ -198,6 +198,7 @@ function stravaStreamsToGpx(
       if (s.type === "time") {
         // Strava stream gives back seconds since the start. We want to save as ISO string so need to add to the start date
         point.time = new Date(
+          // TODO: what is this -200000 for? do i need it for avoiding strava dupe detection?
           start_date.getTime() + s.data[i] * 1000 - 200000,
         ).toISOString();
       } else {
@@ -279,5 +280,7 @@ export async function uploadActivity(
     retryCount++;
   }
 
-  throw new Error("Upload timed out after 30 seconds");
+  throw new Error(
+    "Upload timed out after 30 seconds. It's possible Strava is just slow today. Try checking your activities later.",
+  );
 }

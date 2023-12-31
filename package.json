@@ -46,7 +46,6 @@
     "react-native-share": "^10.0.2",
     "react-native-svg": "13.9.0",
     "react-native-vector-icons": "^10.0.3",
-    "react-native-wagmi-charts": "^2.3.2",
     "react-native-web": "~0.19.6",
     "react-native-web-maps": "^0.3.0"
   },

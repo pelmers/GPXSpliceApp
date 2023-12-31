@@ -7,7 +7,6 @@ import { RootStackParamList } from "../routes";
 import { fetchStravaActivityGpxToDisk } from "../types/strava";
 import { LoadingModal } from "../components/LoadingModal";
 import { StravaActivityList } from "../components/StravaActivityList";
-import { useStravaToken } from "../providers/StravaTokenProvider";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Split (Strava)">;
 

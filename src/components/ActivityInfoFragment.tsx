@@ -1,15 +1,10 @@
-import { useContext } from "react";
 import { StyleSheet, View, Pressable, Text } from "react-native";
 
 import humanizeDuration from "humanize-duration";
 
 import { colors } from "../utils/colors";
 import { GpxSummary } from "../utils/gpx";
-import {
-  SettingsContext,
-  SettingsContextType,
-  useSettings,
-} from "../providers/SettingsProvider";
+import { useSettings } from "../providers/SettingsProvider";
 import { convert } from "../types/settings";
 
 // See full list at https://developers.strava.com/docs/reference/#api-models-SportType

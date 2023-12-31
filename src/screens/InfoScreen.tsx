@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  View,
   Text,
   ScrollView,
   Linking,
   TouchableHighlight,
   StyleSheet,
+  Platform,
 } from "react-native";
 
 import Constants from "expo-constants";
@@ -16,11 +16,19 @@ import { colors } from "../utils/colors";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Info">;
 
+function getStoreUrl() {
+  if (Platform.OS === "ios") {
+    // TODO update on publish
+    return "ios store url";
+  } else {
+    return "https://play.google.com/store/apps/details?id=com.pelmers.gpxsplice";
+  }
+}
+
 export function InfoScreen({ navigation }: Props) {
   const appName = Constants.expoConfig?.name || "GPX Splice";
   const appVersion = Constants.expoConfig?.version || "1.0.0";
-  // TODO update this URL when the app is published
-  const reviewUrl = "https://app-review-url";
+  const reviewUrl = getStoreUrl();
 
   const issueUrl = "https://github.com/pelmers/GPXSpliceApp/issues";
   const authorName = "Peter Elmers";
@@ -37,7 +45,7 @@ export function InfoScreen({ navigation }: Props) {
         underlayColor={colors.tertiary}
         onPress={() => Linking.openURL(reviewUrl)}
       >
-        <Text style={styles.link}>Leave a Review</Text>
+        <Text style={styles.link}>View in Store</Text>
       </TouchableHighlight>
       <TouchableHighlight
         style={styles.linkContainer}

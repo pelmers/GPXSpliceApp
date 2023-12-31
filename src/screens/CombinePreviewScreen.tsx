@@ -1,22 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  ActivityIndicator,
-  TouchableHighlight,
-} from "react-native";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 
 import * as FileSystem from "expo-file-system";
-import * as Sharing from "expo-sharing";
-
-// For web, consider @teovilla/react-native-web-maps
-// e.g. https://stackoverflow.com/a/76702937/2288934
 
 import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../routes";
-import { GpxFile, parseGpxFile, pointsToGpx } from "../utils/gpx";
+import { GpxFile, parseGpxFile } from "../utils/gpx";
 import { GpxMapView } from "../components/GpxMapView";
 import { ExportButtonRow } from "../components/ExportButtonRow";
 

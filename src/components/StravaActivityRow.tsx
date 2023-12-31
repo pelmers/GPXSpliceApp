@@ -1,12 +1,4 @@
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  Text,
-  TouchableHighlight,
-} from "react-native";
-
-import humanizeDuration from "humanize-duration";
+import { StyleSheet, View, TouchableHighlight } from "react-native";
 
 import { colors } from "../utils/colors";
 import { StravaActivity } from "../types/strava";
