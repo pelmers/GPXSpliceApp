@@ -4,27 +4,27 @@
     {
       "commentRange": {
         "start": {
-          "line": 282,
-          "char": 42
+          "line": 255,
+          "char": 2
         },
         "end": {
-          "line": 282,
-          "char": 44
+          "line": 255,
+          "char": 23
         }
       },
       "codeRange": {
         "start": {
-          "line": 254,
-          "char": 21
+          "line": 283,
+          "char": 28
         },
         "end": {
-          "line": 254,
-          "char": 23
+          "line": 283,
+          "char": 38
         }
       },
       "codeRelativePath": "",
-      "commentValue": "30",
-      "codeValue": "30",
+      "commentValue": "const retryLimit = 30",
+      "codeValue": "30 seconds",
       "id": 0
     }
   ],

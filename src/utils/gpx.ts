@@ -29,6 +29,19 @@ export type GpxSummary = {
   averagePower: number | null;
 }>;
 
+// Return a version of the gpx file with all times offset by the given number of milliseconds
+export function offsetAllTimes(gpx: GpxFile, offsetMs: number): GpxFile {
+  return {
+    ...gpx,
+    points: gpx.points.map((point) => ({
+      ...point,
+      time: point.time
+        ? new Date(new Date(point.time).getTime() + offsetMs).toISOString()
+        : undefined,
+    })),
+  };
+}
+
 // Converts a list of points into a gpx file
 export function pointsToGpx(gpx: GpxFile): string {
   const { points, name, type } = gpx;

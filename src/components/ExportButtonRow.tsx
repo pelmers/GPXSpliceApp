@@ -12,7 +12,7 @@ import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 
 import { colors } from "../utils/colors";
-import { GpxFile, pointsToGpx } from "../utils/gpx";
+import { GpxFile, offsetAllTimes, pointsToGpx } from "../utils/gpx";
 import { useStravaToken } from "../providers/StravaTokenProvider";
 import { uploadActivity } from "../types/strava";
 import { Linking } from "react-native";
@@ -74,9 +74,12 @@ export function ExportButtonRow(props: Props) {
       Linking.openURL(url);
     } else {
       try {
+        // Strava detects duplicate activities based on start time within 30 seconds.
+        // so we offset by exactly 30.001 seconds to avoid this, otherwise uploading combined
+        // activities and the first part of a split activity will not work.
         const uploadResponse = await uploadActivity(
           stravaToken!.accessToken,
-          gpx,
+          offsetAllTimes(gpx, 30 * 1000 + 1),
         );
         setActivityId(uploadResponse.activity_id);
       } catch (e) {

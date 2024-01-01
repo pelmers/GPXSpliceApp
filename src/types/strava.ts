@@ -199,7 +199,8 @@ function stravaStreamsToGpx(
         // Strava stream gives back seconds since the start. We want to save as ISO string so need to add to the start date
         point.time = new Date(
           // TODO: what is this -200000 for? do i need it for avoiding strava dupe detection?
-          start_date.getTime() + s.data[i] * 1000 - 200000,
+          // start_date.getTime() + s.data[i] * 1000 - 200000,
+          start_date.getTime() + s.data[i] * 1000,
         ).toISOString();
       } else {
         point[s.type] = s.data[i];
@@ -253,7 +254,6 @@ export async function uploadActivity(
   const { id } = responseJson;
 
   const retryLimit = 30;
-  const retryInterval = 1000;
   let retryCount = 0;
   while (retryCount < retryLimit) {
     const statusResponse = await fetch(
@@ -276,7 +276,7 @@ export async function uploadActivity(
     if (statusJson.status === "Your activity is ready.") {
       return statusJson;
     }
-    await new Promise((resolve) => setTimeout(resolve, retryInterval));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     retryCount++;
   }
 
