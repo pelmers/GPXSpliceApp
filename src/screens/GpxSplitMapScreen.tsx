@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 
-import * as FileSystem from "expo-file-system";
+import FileSystem from "../utils/UniversalFileSystem";
 
 // For web, consider @teovilla/react-native-web-maps
 // e.g. https://stackoverflow.com/a/76702937/2288934

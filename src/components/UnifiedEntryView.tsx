@@ -6,7 +6,7 @@ import {
   Platform,
   TouchableHighlight,
 } from "react-native";
-import queryString from "query-string";
+import queryString, { ParsedQuery } from "query-string";
 
 import * as DocumentPicker from "expo-document-picker";
 import * as AuthSession from "expo-auth-session";
@@ -17,6 +17,7 @@ import {
   STRAVA_AUTH_ENDPOINT,
   CLIENT_ID,
   REDIRECT_SERVER_URL,
+  WEB_ORIGIN,
 } from "../utils/client";
 import { StravaAthlete } from "../types/strava";
 import { useStravaToken } from "../providers/StravaTokenProvider";
@@ -85,12 +86,34 @@ export function UnifiedEntryScreen(props: Props) {
     },
   );
 
-  const handleAuthResponse = (url: string) => {
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== WEB_ORIGIN) return;
+
+        const { data } = event;
+        if (data.scope || data.error_description) {
+          handleAuthResponse(data);
+        }
+      };
+
+      window.addEventListener("message", handleMessage);
+
+      // Clean up the event listener when the component is unmounted
+      return () => {
+        window.removeEventListener("message", handleMessage);
+      };
+    }
+  }, []);
+
+  const parseUrlQuery = (url: string) => {
     const queryStringStart = url.indexOf("?");
     const queryPart =
       queryStringStart !== -1 ? url.substring(queryStringStart) : "";
-    const parsed = queryString.parse(queryPart);
+    return queryString.parse(queryPart);
+  };
 
+  const handleAuthResponse = (parsed: ParsedQuery) => {
     const { payload, scope } = parsed;
     if (payload) {
       const payloadObj = JSON.parse(decodeURIComponent(payload as string));
@@ -124,7 +147,7 @@ export function UnifiedEntryScreen(props: Props) {
 
   useEffect(() => {
     if (response != null && response.type === "success") {
-      handleAuthResponse(response.url);
+      handleAuthResponse(parseUrlQuery(response.url));
     }
   }, [response]);
 
@@ -135,7 +158,7 @@ export function UnifiedEntryScreen(props: Props) {
     }
     const handler = async (event: Linking.EventType) => {
       // See: https://github.com/expo/expo/issues/12044#issuecomment-889031264
-      handleAuthResponse(event.url);
+      handleAuthResponse(parseUrlQuery(event.url));
     };
     const subscription = Linking.addEventListener("url", handler);
     return () => {

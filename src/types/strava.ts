@@ -1,6 +1,7 @@
+import { Platform, Linking } from "react-native";
 import { GpxFile, GpxPoint, pointsToGpx } from "../utils/gpx";
 
-import * as FileSystem from "expo-file-system";
+import FileSystem from "../utils/UniversalFileSystem";
 
 // incomplete, refer to https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities
 export type StravaActivity = { id: number } & Partial<{
@@ -283,4 +284,21 @@ export async function uploadActivity(
   throw new Error(
     "Upload timed out after 30 seconds. It's possible Strava is just slow today. Try checking your activities later.",
   );
+}
+
+export async function getStravaAuthEndpoint() {
+  const defaultEndpoint = "https://www.strava.com/oauth/mobile/authorize";
+  const appEndpoint = "strava://oauth/mobile/authorize";
+  // If the platform is android or web, use the default endpoint
+  // On android the implicit intent will open the Strava app if it's installed
+  if (Platform.OS === "android" || Platform.OS === "web") {
+    return defaultEndpoint;
+  } else {
+    // On iOS we should first check if the Strava app is installed, and if so, use the custom URL scheme
+    if (await Linking.canOpenURL(appEndpoint)) {
+      return appEndpoint;
+    }
+    // Otherwise use the default
+    return defaultEndpoint;
+  }
 }

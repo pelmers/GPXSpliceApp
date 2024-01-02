@@ -9,7 +9,7 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import * as FileSystem from "expo-file-system";
+import FileSystem from "../utils/UniversalFileSystem";
 
 import { RootStackParamList } from "../routes";
 import { colors } from "../utils/colors";

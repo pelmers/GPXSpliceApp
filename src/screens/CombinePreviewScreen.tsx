@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 
-import * as FileSystem from "expo-file-system";
+import FileSystem from "../utils/UniversalFileSystem";
 
 import { colors } from "../utils/colors";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";

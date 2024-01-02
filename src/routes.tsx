@@ -18,4 +18,5 @@ export type RootStackParamList = {
     splitIndex: number;
     gpxFileUri: string;
   };
+  AuthRedirect: undefined;
 };

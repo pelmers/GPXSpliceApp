@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Platform } from "react-native";
 
 import * as Font from "expo-font";
 import { registerRootComponent } from "expo";
@@ -18,6 +19,8 @@ import { SettingsScreen } from "./screens/SettingsScreen";
 import { SettingsProvider } from "./providers/SettingsProvider";
 import { InfoScreen } from "./screens/InfoScreen";
 import { StravaTokenProvider } from "./providers/StravaTokenProvider";
+import PostAuthMessagePost from "./screens/PostAuthMessagePostScreen";
+import { WEB_ORIGIN } from "./utils/client";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -35,13 +38,25 @@ export default function App() {
     loadFont();
   }, []);
 
+  let linking;
+  if (Platform.OS === "web") {
+    linking = {
+      prefixes: [WEB_ORIGIN],
+      config: {
+        screens: {
+          AuthRedirect: "auth_redirect",
+        },
+      },
+    };
+  }
+
   if (!fontLoaded) {
     return null;
   }
   return (
     <SettingsProvider>
       <StravaTokenProvider>
-        <NavigationContainer>
+        <NavigationContainer linking={linking}>
           <Stack.Navigator initialRouteName="Home">
             <Stack.Screen
               name="Home"
@@ -66,6 +81,7 @@ export default function App() {
               name="Combine (Strava)"
               component={StravaCombineActivitiesScreen}
             />
+            <Stack.Screen name="AuthRedirect" component={PostAuthMessagePost} />
           </Stack.Navigator>
         </NavigationContainer>
       </StravaTokenProvider>
