@@ -18,8 +18,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Info">;
 
 function getStoreUrl() {
   if (Platform.OS === "ios") {
-    // TODO update on publish
-    return "ios store url";
+    return "https://apps.apple.com/app/gpxsplice/id6475313748"
   } else {
     return "https://play.google.com/store/apps/details?id=com.pelmers.gpxsplice";
   }
@@ -36,7 +35,7 @@ export function InfoScreen({ navigation }: Props) {
   const authorEmail = "peter@pelmers.com";
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.containerContent}>
       <Text style={styles.title}>
         {appName} v{appVersion}
       </Text>
@@ -78,6 +77,10 @@ const styles = StyleSheet.create({
   container: {
     padding: 25,
     backgroundColor: colors.dark,
+  },
+  containerContent: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     fontSize: 42,

@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "comments": [
+    {
+      "commentRange": {
+        "start": {
+          "line": 4,
+          "char": 9
+        },
+        "end": {
+          "line": 4,
+          "char": 58
+        }
+      },
+      "codeRange": {
+        "start": {
+          "line": 20,
+          "char": 12
+        },
+        "end": {
+          "line": 20,
+          "char": 61
+        }
+      },
+      "codeRelativePath": "../src/screens/InfoScreen.tsx",
+      "commentValue": "https://apps.apple.com/app/gpxsplice/id6475313748",
+      "codeValue": "https://apps.apple.com/app/gpxsplice/id6475313748",
+      "id": 0
+    },
+    {
+      "commentRange": {
+        "start": {
+          "line": 5,
+          "char": 9
+        },
+        "end": {
+          "line": 5,
+          "char": 76
+        }
+      },
+      "codeRange": {
+        "start": {
+          "line": 22,
+          "char": 12
+        },
+        "end": {
+          "line": 22,
+          "char": 79
+        }
+      },
+      "codeRelativePath": "../src/screens/InfoScreen.tsx",
+      "commentValue": "https://play.google.com/store/apps/details?id=com.pelmers.gpxsplice",
+      "codeValue": "https://play.google.com/store/apps/details?id=com.pelmers.gpxsplice",
+      "id": 1
+    }
+  ],
+  "configuration": {
+    "lineComment": null
+  }
+}

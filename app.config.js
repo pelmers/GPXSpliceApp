@@ -34,7 +34,6 @@ module.exports = () => ({
       },
       config: {
         googleMaps: {
-          // TODO: protect the api key in google maps console https://console.cloud.google.com/google/maps-apis/credentials?project=gpxsplice
           apiKey: process.env.GOOGLE_MAPS_API_KEY,
         },
       },
