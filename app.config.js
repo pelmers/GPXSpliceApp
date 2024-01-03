@@ -25,6 +25,10 @@ module.exports = () => ({
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.pelmers.gpxsplice",
+      infoPlist: {
+        // allows us to link to Strava app for oauth
+        LSApplicationQueriesSchemes: ["strava"],
+      },
     },
     android: {
       package: "com.pelmers.gpxsplice",

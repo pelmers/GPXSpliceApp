@@ -4,7 +4,7 @@
 import React, { useEffect } from "react";
 
 import * as AuthSession from "expo-auth-session";
-import { WEB_ORIGIN } from "src/utils/client";
+import { WEB_ORIGIN } from "../utils/client";
 
 const PostAuthMessagePostScreen = () => {
   useEffect(() => {

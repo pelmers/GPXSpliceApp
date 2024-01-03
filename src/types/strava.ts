@@ -295,8 +295,13 @@ export async function getStravaAuthEndpoint() {
     return defaultEndpoint;
   } else {
     // On iOS we should first check if the Strava app is installed, and if so, use the custom URL scheme
-    if (await Linking.canOpenURL(appEndpoint)) {
-      return appEndpoint;
+    try {
+      if (await Linking.canOpenURL(appEndpoint)) {
+        return appEndpoint;
+      }
+    } catch (error) {
+      console.error("An error occurred", error);
+      return defaultEndpoint;
     }
     // Otherwise use the default
     return defaultEndpoint;

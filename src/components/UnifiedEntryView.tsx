@@ -13,13 +13,8 @@ import * as AuthSession from "expo-auth-session";
 import * as Linking from "expo-linking";
 
 import { colors } from "../utils/colors";
-import {
-  STRAVA_AUTH_ENDPOINT,
-  CLIENT_ID,
-  REDIRECT_SERVER_URL,
-  WEB_ORIGIN,
-} from "../utils/client";
-import { StravaAthlete } from "../types/strava";
+import { CLIENT_ID, REDIRECT_SERVER_URL, WEB_ORIGIN } from "../utils/client";
+import { StravaAthlete, getStravaAuthEndpoint } from "../types/strava";
 import { useStravaToken } from "../providers/StravaTokenProvider";
 import { Alert } from "react-native";
 
@@ -59,6 +54,9 @@ type Props = {
 
 export function UnifiedEntryScreen(props: Props) {
   const [error, setError] = useState<string | null>(null);
+  const [authorizationEndpoint, setAuthorizationEndpoint] = useState<
+    string | undefined
+  >();
 
   const { setStravaToken } = useStravaToken();
 
@@ -82,9 +80,15 @@ export function UnifiedEntryScreen(props: Props) {
       redirectUri: redirectUri.toString(),
     },
     {
-      authorizationEndpoint: STRAVA_AUTH_ENDPOINT,
+      authorizationEndpoint,
     },
   );
+
+  useEffect(() => {
+    (async () => {
+      setAuthorizationEndpoint(await getStravaAuthEndpoint());
+    })();
+  }, []);
 
   useEffect(() => {
     if (Platform.OS === "web") {
@@ -172,7 +176,7 @@ export function UnifiedEntryScreen(props: Props) {
       <TouchableHighlight
         underlayColor={colors.primary}
         style={[styles.button, { backgroundColor: colors.strava }]}
-        disabled={!request}
+        disabled={!request || authorizationEndpoint == null}
         onPress={async () => {
           try {
             await promptAsync({ showInRecents: false });
