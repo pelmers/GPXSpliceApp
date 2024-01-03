@@ -300,7 +300,7 @@ export async function getStravaAuthEndpoint() {
         return appEndpoint;
       }
     } catch (error) {
-      console.error("An error occurred", error);
+      console.error("An error occurred in checking strava endpoint", error);
       return defaultEndpoint;
     }
     // Otherwise use the default

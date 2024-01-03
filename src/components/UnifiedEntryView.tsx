@@ -18,6 +18,30 @@ import { StravaAthlete, getStravaAuthEndpoint } from "../types/strava";
 import { useStravaToken } from "../providers/StravaTokenProvider";
 import { Alert } from "react-native";
 
+// On the web platform, oauth token is passed by window.postMessage from a
+// redirect page opened in a pop-up window, so this hook listens for that
+const useWebOAuthHandler = (handleAuthResponse: (data: any) => void) => {
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== WEB_ORIGIN) return;
+
+        const { data } = event;
+        if (data.scope || data.error_description) {
+          handleAuthResponse(data);
+        }
+      };
+
+      window.addEventListener("message", handleMessage);
+
+      // Clean up the event listener when the component is unmounted
+      return () => {
+        window.removeEventListener("message", handleMessage);
+      };
+    }
+  }, [handleAuthResponse]);
+};
+
 export async function getGpxFileUris(options: {
   multiple: boolean;
 }): Promise<string[]> {
@@ -60,56 +84,6 @@ export function UnifiedEntryScreen(props: Props) {
 
   const { setStravaToken } = useStravaToken();
 
-  // The client uri defines a uri that will come back to this screen when it's opened on the client
-  const clientUri = AuthSession.makeRedirectUri({
-    path: "/auth_redirect",
-    isTripleSlashed: true,
-  });
-
-  // I originally encoded the client uri as a query param, but for some reason this was getting
-  // dropped when going through Strava's app-based mobile auth (though worked on the web version)
-  // Instead we encode it in the path itself, after the client_uri part (which the server knows)
-  const redirectUri = new URL(
-    `${REDIRECT_SERVER_URL}/client_uri/${encodeURIComponent(clientUri)}`,
-  );
-
-  const [request, response, promptAsync] = AuthSession.useAuthRequest(
-    {
-      clientId: CLIENT_ID,
-      scopes: ["activity:read_all,activity:write"],
-      redirectUri: redirectUri.toString(),
-    },
-    {
-      authorizationEndpoint,
-    },
-  );
-
-  useEffect(() => {
-    (async () => {
-      setAuthorizationEndpoint(await getStravaAuthEndpoint());
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      const handleMessage = (event: MessageEvent) => {
-        if (event.origin !== WEB_ORIGIN) return;
-
-        const { data } = event;
-        if (data.scope || data.error_description) {
-          handleAuthResponse(data);
-        }
-      };
-
-      window.addEventListener("message", handleMessage);
-
-      // Clean up the event listener when the component is unmounted
-      return () => {
-        window.removeEventListener("message", handleMessage);
-      };
-    }
-  }, []);
-
   const parseUrlQuery = (url: string) => {
     const queryStringStart = url.indexOf("?");
     const queryPart =
@@ -142,24 +116,38 @@ export function UnifiedEntryScreen(props: Props) {
       }
       props.onAuthSuccess();
     } else {
-      const errorDescription = parsed.error_description;
+      const errorDescription = parsed.error_description || parsed.error;
       if (errorDescription) {
         setError(errorDescription as string);
       }
     }
   };
 
-  useEffect(() => {
-    if (response != null && response.type === "success") {
-      handleAuthResponse(parseUrlQuery(response.url));
-    }
-  }, [response]);
+  // The client uri defines a uri that will come back to this screen when it's opened on the client
+  // Note that on web this will actually open PostAuthMessagePostScreen, which then posts the token
+  // back to this window.
+  const clientUri = AuthSession.makeRedirectUri({
+    path: "/auth_redirect",
+    isTripleSlashed: true,
+  });
+
+  // I originally encoded the client uri as a query param, but for some reason this was getting
+  // dropped when going through Strava's app-based mobile auth (though worked on the web version)
+  // Instead we encode it in the path itself, after the client_uri part (which the server knows)
+  const redirectUri = new URL(
+    `${REDIRECT_SERVER_URL}/client_uri/${encodeURIComponent(clientUri)}`,
+  );
 
   useEffect(() => {
-    // workaround android bug (https://github.com/expo/expo/issues/12044), so if not android, skip
-    if (Platform.OS !== "android") {
-      return;
-    }
+    (async () => {
+      setAuthorizationEndpoint(await getStravaAuthEndpoint());
+    })();
+  }, []);
+
+  useWebOAuthHandler(handleAuthResponse);
+
+  useEffect(() => {
+    // using deeplink handler as workaround for android bug (https://github.com/expo/expo/issues/12044)
     const handler = async (event: Linking.EventType) => {
       // See: https://github.com/expo/expo/issues/12044#issuecomment-889031264
       handleAuthResponse(parseUrlQuery(event.url));
@@ -176,11 +164,19 @@ export function UnifiedEntryScreen(props: Props) {
       <TouchableHighlight
         underlayColor={colors.primary}
         style={[styles.button, { backgroundColor: colors.strava }]}
-        disabled={!request || authorizationEndpoint == null}
+        disabled={authorizationEndpoint == null}
         onPress={async () => {
+          const params = new URLSearchParams({
+            client_id: CLIENT_ID,
+            redirect_uri: redirectUri.toString(),
+            response_type: "code",
+            scope: "activity:read_all,activity:write",
+          });
+
+          const authUrl = `${authorizationEndpoint!}?${params.toString()}`;
+
           try {
-            await promptAsync({ showInRecents: false });
-            setError(null);
+            await Linking.openURL(authUrl);
           } catch (e) {
             setError((e as Error).message);
           }
