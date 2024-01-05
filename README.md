@@ -11,8 +11,6 @@
 
 ### The _easy_ way to split and combine your GPX files and Strava activities, from your phone!
 
-![](examples/gpx_splice_split_demo.gif)
-
 ## Features
 
 - Support GPX files and Strava activities
