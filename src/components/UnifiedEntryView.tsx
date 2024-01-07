@@ -186,7 +186,11 @@ export function UnifiedEntryScreen(props: Props) {
           const authUrl = `${authorizationEndpoint!}?${params.toString()}`;
 
           try {
-            await Linking.openURL(authUrl);
+            if (Platform.OS === "web") {
+              window.open(authUrl, "_blank", "height=600,width=500");
+            } else {
+              await Linking.openURL(authUrl);
+            }
           } catch (e) {
             setError((e as Error).message);
           }
