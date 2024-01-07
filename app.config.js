@@ -12,7 +12,7 @@ if (!process.env.GOOGLE_MAPS_API_KEY) {
 
 const versionParts = VERSION.split(".").map(Number);
 const versionCode =
-  versionParts[0] * 10000 + versionParts[1] * 100 + versionParts[2];
+  versionParts[0] * 100000 + versionParts[1] * 1000 + versionParts[2] * 10;
 
 module.exports = () => ({
   expo: {

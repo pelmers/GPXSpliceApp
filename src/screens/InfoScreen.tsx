@@ -22,6 +22,7 @@ function getStoreUrl() {
   } else {
     return "https://play.google.com/store/apps/details?id=com.pelmers.gpxsplice";
   }
+  // TODO: add a url for the web version
 }
 
 export function InfoScreen({ navigation }: Props) {

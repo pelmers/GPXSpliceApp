@@ -36,7 +36,8 @@ export function HomeScreen({ navigation }: Props) {
         shouldPlay
         isLooping
       />
-      <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+      {/* expo blur doesn't work with transitions on android: https://github.com/expo/expo/issues/3523#issuecomment-472146615 */}
+      {Platform.OS === 'ios' && <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />}
       <View style={styles.title}>
         <Text style={styles.titleText}>GPX Splice</Text>
       </View>
