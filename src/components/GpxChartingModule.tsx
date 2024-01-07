@@ -95,6 +95,8 @@ function yAxisUnitsForType(chartType: ChartType, settings: SavedSettings) {
   }
 }
 
+type AggregateType = "gain" | "avg";
+
 function computeXYValues(
   points: GpxPoint[],
   chartType: ChartType,
@@ -105,7 +107,15 @@ function computeXYValues(
   }
   const xValues = calculateCumulativeDistance(points);
   const yValues: number[] = [];
+  // yValueAggregaetes contains a list to allow efficient calculation of the aggregate at any split point
+  const yValueAggregateSums: number[] = [];
+  const yValueAggregateType =
+    chartType === "elevation"
+      ? ("gain" as AggregateType)
+      : ("avg" as AggregateType);
+
   for (let i = 0; i < points.length; i++) {
+    const lastYValueAggregateSum = yValueAggregateSums[i - 1] ?? 0;
     const point = points[i];
     switch (chartType) {
       case "elevation":
@@ -147,8 +157,23 @@ function computeXYValues(
         yValues.push(convert(point.temp ?? 0, TEMP_UNITS.C, settings).value);
         break;
     }
+    switch (yValueAggregateType) {
+      case "gain":
+        const yValueAggregate =
+          i > 0 ? Math.max(0, yValues[i] - yValues[i - 1]) : 0;
+        yValueAggregateSums.push(yValueAggregate + lastYValueAggregateSum);
+        break;
+      case "avg":
+        yValueAggregateSums.push(yValues[i] + lastYValueAggregateSum);
+        break;
+    }
   }
-  return { xValues, yValues };
+  return {
+    xValues,
+    yValues,
+    yValueAggregateSums,
+    yValueAggregateType,
+  };
 }
 
 function ChartButtonRow(props: {
@@ -200,10 +225,11 @@ export function GpxChartingModule(props: Props) {
   const [chartType, setChartType] = useState<ChartType>("elevation");
   const { settings } = useSettings();
   const { gpxFile, splitData, chartHeight, chartWidth } = props;
-  const { xValues, yValues } = useMemo(
-    () => computeXYValues(gpxFile.points, chartType, settings),
-    [gpxFile, chartType],
-  );
+  const { xValues, yValues, yValueAggregateSums, yValueAggregateType } =
+    useMemo(
+      () => computeXYValues(gpxFile.points, chartType, settings),
+      [gpxFile, chartType],
+    );
 
   const splitPercent =
     splitData != null
@@ -217,6 +243,19 @@ export function GpxChartingModule(props: Props) {
       ? `${yValues[splitData.index].toFixed(1)} ${yUnits}
 ${xValues[splitData.index].toFixed(1)} ${xUnits}`
       : null;
+
+  const aggregateForInterval = (start: number, end: number) => {
+    switch (yValueAggregateType) {
+      case "gain":
+        return yValueAggregateSums[end - 1] - yValueAggregateSums[start];
+      case "avg":
+        return (
+          (yValueAggregateSums[end - 1] - yValueAggregateSums[start]) /
+          (end - start)
+        );
+    }
+  };
+
   // A row of buttons with icons, then a chart below and a split marker that follows the slider if given
   return (
     <View>
@@ -234,26 +273,73 @@ ${xValues[splitData.index].toFixed(1)} ${xUnits}`
           width={chartWidth}
           height={chartHeight}
         />
-        {splitPercent != null && (
-          // 64 and 16 are the margins of the chart axes, determined by inspection
+        {splitPercent != null ? (
+          <>
+            {/* 64 and 16 are the margins of the chart axes, determined by inspection */}
+            <View
+              style={{
+                position: "absolute",
+                left: 64 + (chartWidth - 64) * splitPercent,
+                top: 32,
+                bottom: 32,
+                width: 2,
+                opacity: 0.7,
+                backgroundColor: colors.primary,
+              }}
+            >
+              <View
+                style={{
+                  position: "absolute",
+                  top: -32,
+                  left: -50,
+                  width: 100,
+                }}
+              >
+                <Text style={{ color: "white", textAlign: "center" }}>
+                  {splitLabel}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                position: "absolute",
+                left: 64,
+                bottom: 48,
+              }}
+            >
+              <Text style={styles.aggregateText}>
+                {yValueAggregateType}:{" "}
+                {aggregateForInterval(0, splitData!.index).toFixed(1)} {yUnits}
+              </Text>
+            </View>
+            <View
+              style={{
+                position: "absolute",
+                right: 10,
+                bottom: 48,
+              }}
+            >
+              <Text style={styles.aggregateText}>
+                {yValueAggregateType}:{" "}
+                {aggregateForInterval(splitData!.index, yValues.length).toFixed(
+                  1,
+                )}{" "}
+                {yUnits}
+              </Text>
+            </View>
+          </>
+        ) : (
           <View
             style={{
               position: "absolute",
-              left: 64 + (chartWidth - 64) * splitPercent,
-              top: 32,
-              bottom: 32,
-              width: 2,
-              opacity: 0.7,
-              backgroundColor: colors.primary,
+              right: 10,
+              bottom: 48,
             }}
           >
-            <View
-              style={{ position: "absolute", top: -32, left: -50, width: 100 }}
-            >
-              <Text style={{ color: "white", textAlign: "center" }}>
-                {splitLabel}
-              </Text>
-            </View>
+            <Text style={styles.aggregateText}>
+              {yValueAggregateType}:{" "}
+              {aggregateForInterval(0, yValues.length).toFixed(1)} {yUnits}
+            </Text>
           </View>
         )}
       </View>
@@ -266,7 +352,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
-    marginVertical: 6,
+    marginVertical: 5,
   },
   button: {
     width: 50,
@@ -287,6 +373,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20,
+  },
+  aggregateText: {
+    color: "rgba(255, 255, 255, 0.7)",
   },
   chartContainer: {
     justifyContent: "center",

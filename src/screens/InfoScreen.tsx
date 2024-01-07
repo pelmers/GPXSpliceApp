@@ -32,7 +32,8 @@ export function InfoScreen({ navigation }: Props) {
   const issueUrl = "https://github.com/pelmers/GPXSpliceApp/issues";
   const authorName = "Peter Elmers";
   const authorWebsite = "https://pelmers.com";
-  const authorEmail = "peter@pelmers.com";
+  // Very slightly obfuscated to avoid spam since this is open source
+  const authorEmail = ["peter", "pelmers.com"].join("@");
 
   return (
     <ScrollView
@@ -94,24 +95,25 @@ const styles = StyleSheet.create({
   linkContainer: {
     marginTop: 20,
     backgroundColor: colors.accent,
-    width: 150,
+    width: 180,
     justifyContent: "center",
   },
   link: {
     color: "white",
     padding: 10,
     textAlign: "center",
+    fontSize: 16,
   },
   author: {
     fontSize: 18,
     fontWeight: "bold",
     marginTop: 40,
-    color: colors.light,
+    color: colors.primary,
   },
   authorName: {
     marginTop: 10,
     color: colors.light,
     fontFamily: "BebasNeue-Regular",
-    fontSize: 30,
+    fontSize: 32,
   },
 });

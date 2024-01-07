@@ -82,7 +82,7 @@ export function UnifiedEntryScreen(props: Props) {
     string | undefined
   >();
 
-  const { setStravaToken } = useStravaToken();
+  const { stravaToken, setStravaToken } = useStravaToken();
 
   const parseUrlQuery = (url: string) => {
     const queryStringStart = url.indexOf("?");
@@ -96,8 +96,10 @@ export function UnifiedEntryScreen(props: Props) {
     if (payload) {
       const payloadObj = JSON.parse(decodeURIComponent(payload as string));
       const accessToken = payloadObj.access_token;
+      const expiresAt = payloadObj.expires_at;
       setStravaToken({
         accessToken,
+        expiresAtUnixSeconds: expiresAt,
         athlete: payloadObj.athlete as StravaAthlete,
         scope: scope as string,
       });
@@ -166,6 +168,14 @@ export function UnifiedEntryScreen(props: Props) {
         style={[styles.button, { backgroundColor: colors.strava }]}
         disabled={authorizationEndpoint == null}
         onPress={async () => {
+          // If the token still has at least 5 minutes left, don't re-auth
+          if (
+            stravaToken?.expiresAtUnixSeconds &&
+            stravaToken?.expiresAtUnixSeconds - Date.now() / 1000 > 5 * 60
+          ) {
+            props.onAuthSuccess();
+            return;
+          }
           const params = new URLSearchParams({
             client_id: CLIENT_ID,
             redirect_uri: redirectUri.toString(),

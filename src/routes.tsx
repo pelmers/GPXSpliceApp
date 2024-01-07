@@ -1,5 +1,3 @@
-import { StravaAthlete } from "./types/strava";
-
 export type RootStackParamList = {
   Home: undefined;
   Settings: undefined;

@@ -55,6 +55,12 @@ def send_analytics_event(path, user_agent, ip_address):
 
 
 class RedirectHandler(BaseHTTPRequestHandler):
+    def handle_error(self, error_message):
+        logging.error(f"Error: {error_message}")
+        self.send_response(500)
+        self.end_headers()
+        self.wfile.write(error_message.encode('utf-8'))
+
     def do_GET(self):
         # Handle favicon first
         if self.path == '/favicon.ico':
@@ -98,16 +104,17 @@ class RedirectHandler(BaseHTTPRequestHandler):
             'grant_type': 'authorization_code'
         }).encode('ascii')
 
-        req = urllib.request.Request(STRAVA_TOKEN_URL, data=data, method='POST')
-        with urllib.request.urlopen(req) as f:
-            res = f.read().decode('utf-8')
-            # If 'access_token' is not present in response, then return an error page
-            if 'access_token' not in res:
-                logging.error(f"Error: {res}")
-                self.send_response(500)
-                self.end_headers()
-                self.wfile.write(res.encode('utf-8'))
-                return
+        try:
+            req = urllib.request.Request(STRAVA_TOKEN_URL, data=data, method='POST')
+            with urllib.request.urlopen(req) as f:
+                res = f.read().decode('utf-8')
+                # If 'access_token' is not present in response, then return an error page
+                if 'access_token' not in res:
+                    self.handle_error(res)
+                    return
+        except Exception as e:
+            self.handle_error(f"Error exchanging code for access token: {e}")
+            return
 
         logging.info(f"Redirecting to {client_uri}")
         # Encode the result in the redirect URL parameters

@@ -1,5 +1,7 @@
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env.local') });
+const VERSION = "1.0.3";
+
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
 
 // If GOOGLE_MAPS_API_KEY is not set, show a warning
 if (!process.env.GOOGLE_MAPS_API_KEY) {
@@ -8,16 +10,15 @@ if (!process.env.GOOGLE_MAPS_API_KEY) {
   );
 }
 
-const version = "1.0.2";
-
-const versionParts = version.split('.').map(Number);
-const versionCode = versionParts[0] * 10000 + versionParts[1] * 100 + versionParts[2];
+const versionParts = VERSION.split(".").map(Number);
+const versionCode =
+  versionParts[0] * 10000 + versionParts[1] * 100 + versionParts[2];
 
 module.exports = () => ({
   expo: {
     name: "GPX Splice",
     slug: "gpxsplice",
-    version,
+    version: VERSION,
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",

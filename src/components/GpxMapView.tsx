@@ -28,7 +28,7 @@ type Props = {
 // MapView usage docs: https://docs.expo.dev/versions/latest/sdk/map-view/
 
 export function GpxMapView({ gpx, sliderOptions, buttonRow }: Props) {
-  const [sliderValue, setSliderValue] = useState(0);
+  const [sliderValue, setSliderValue] = useState(0.5);
   const [distances, setDistances] = useState<number[]>([]);
 
   // Set distances on mount
@@ -110,6 +110,7 @@ export function GpxMapView({ gpx, sliderOptions, buttonRow }: Props) {
             minimumTrackTintColor={colors.light}
             maximumTrackTintColor={colors.accent}
             onValueChange={(value) => setSliderValue(value)}
+            value={sliderValue}
           />
           <TouchableHighlight
             underlayColor={colors.primary}

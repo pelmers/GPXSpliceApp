@@ -3,6 +3,7 @@ import { StravaAthlete } from "../types/strava";
 
 type SavedStravaToken = {
   accessToken: string;
+  expiresAtUnixSeconds: number;
   scope: string;
   athlete: StravaAthlete;
 };
