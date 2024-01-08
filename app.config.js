@@ -1,4 +1,6 @@
 const VERSION = "1.0.3";
+// Must be less than 10
+const HOTFIX = 0;
 
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
@@ -12,7 +14,7 @@ if (!process.env.GOOGLE_MAPS_API_KEY) {
 
 const versionParts = VERSION.split(".").map(Number);
 const versionCode =
-  versionParts[0] * 100000 + versionParts[1] * 1000 + versionParts[2] * 10;
+  versionParts[0] * 100000 + versionParts[1] * 1000 + versionParts[2] * 10 + HOTFIX;
 
 module.exports = () => ({
   expo: {
