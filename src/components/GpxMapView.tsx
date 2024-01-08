@@ -8,14 +8,10 @@ import {
 } from "react-native";
 import Slider from "@react-native-community/slider";
 
-// For web, consider @teovilla/react-native-web-maps
-// e.g. https://stackoverflow.com/a/76702937/2288934
-import MapView from "react-native-maps";
-import { Polyline, Marker } from "react-native-maps";
-
 import { colors } from "../utils/colors";
 import { GpxFile, calculateCumulativeDistance } from "../utils/gpx";
 import { GpxChartingModule } from "./GpxChartingModule";
+import { MapView, Polyline, Marker } from "./MapView";
 
 type Props = {
   gpx: GpxFile;
@@ -24,8 +20,6 @@ type Props = {
   };
   buttonRow?: React.ReactNode;
 };
-
-// MapView usage docs: https://docs.expo.dev/versions/latest/sdk/map-view/
 
 export function GpxMapView({ gpx, sliderOptions, buttonRow }: Props) {
   const [sliderValue, setSliderValue] = useState(0.5);

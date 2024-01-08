@@ -13,9 +13,18 @@ const PostAuthMessagePostScreen = () => {
 
     const scope = urlParams.get("scope");
     const payload = urlParams.get("payload");
+    const error = urlParams.get("error");
 
     if (!payload) {
       console.error("No payload found in url params");
+    }
+
+    if (error) {
+      if (window.opener) {
+        window.opener.postMessage({ error_description: error }, origin);
+        window.close();
+      }
+      console.error("Error in url params", error);
     }
 
     if (payload && window.opener) {
