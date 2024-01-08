@@ -56,6 +56,7 @@ export function StravaActivityList(props: Props) {
 
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
+  const [reachedEnd, setReachedEnd] = useState(false);
 
   const { stravaToken } = useStravaToken();
   if (stravaToken === null) {
@@ -76,6 +77,9 @@ export function StravaActivityList(props: Props) {
       }
       const newActivities = await fetchStravaActivities(accessToken, page);
       setActivities((prevActivities) => [...prevActivities, ...newActivities]);
+      if (newActivities.length === 0) {
+        setReachedEnd(true);
+      }
     } catch (error) {
       console.error(error);
       setError((error as Error).message);
@@ -117,10 +121,19 @@ export function StravaActivityList(props: Props) {
             }}
           />
         )}
-        onEndReached={() => setPage((prevPage) => prevPage + 1)}
+        onEndReached={() => {
+          if (!reachedEnd) {
+            setPage((prevPage) => prevPage + 1);
+          }
+        }}
         onEndReachedThreshold={0.5}
         refreshing={refreshing}
         onRefresh={refreshActivities}
+        ListFooterComponent={() =>
+          reachedEnd ? (
+            <Text style={styles.endOfListText}>End of activity list</Text>
+          ) : null
+        }
       />
     </>
   );
@@ -152,5 +165,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: "center",
     fontWeight: "bold",
+  },
+  endOfListText: {
+    textAlign: "center",
+    color: "#888",
+    fontSize: 16,
+    padding: 10,
   },
 });
