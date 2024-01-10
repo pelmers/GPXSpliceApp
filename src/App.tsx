@@ -25,21 +25,13 @@ import { WEB_ORIGIN } from "./utils/client";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
-  const [fontLoaded, setFontLoaded] = useState(false);
-
-  useEffect(() => {
-    async function loadFont() {
-      await Font.loadAsync({
-        "BebasNeue-Regular": require("../assets/fonts/BebasNeue-Regular.ttf"),
-      });
-      setFontLoaded(true);
-    }
-
-    loadFont();
-  }, []);
+  const [fontLoaded] = Font.useFonts({
+    "BebasNeue-Regular": require("../assets/fonts/BebasNeue-Regular.ttf"),
+  });
 
   let linking;
   if (Platform.OS === "web") {
+    // On web the auth_redirect path should go to the auth redirect screen
     linking = {
       prefixes: [WEB_ORIGIN],
       config: {
