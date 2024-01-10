@@ -5,6 +5,7 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -28,30 +29,39 @@ type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
 interface ButtonSettingRowProps<T> {
   label: string;
-  selectedValue: T;
+  selectedValue?: T;
   onValueChange: (itemValue: T) => void;
   items: { label: string; value: T }[];
 }
 
 function ButtonSettingRow<T>(props: ButtonSettingRowProps<T>) {
   const { label, selectedValue, onValueChange, items } = props;
+
+  // Split items into chunks of two
+  const itemChunks = [];
+  for (let i = 0; i < items.length; i += 2) {
+    itemChunks.push(items.slice(i, i + 2));
+  }
+
   return (
     <View>
       <Text style={buttonRowStyles.labelText}>{label}</Text>
-      <View style={buttonRowStyles.buttonContainer}>
-        {items.map((item, i) => (
-          <TouchableOpacity
-            key={i}
-            style={[
-              buttonRowStyles.button,
-              selectedValue === item.value && buttonRowStyles.selectedButton,
-            ]}
-            onPress={() => onValueChange(item.value)}
-          >
-            <Text style={buttonRowStyles.buttonText}>{item.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      {itemChunks.map((chunk, i) => (
+        <View key={i} style={buttonRowStyles.buttonContainer}>
+          {chunk.map((item, j) => (
+            <TouchableOpacity
+              key={j}
+              style={[
+                buttonRowStyles.button,
+                selectedValue === item.value && buttonRowStyles.selectedButton,
+              ]}
+              onPress={() => onValueChange(item.value)}
+            >
+              <Text style={buttonRowStyles.buttonText}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
@@ -76,7 +86,7 @@ const buttonRowStyles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   buttonText: {
-    fontSize: 15,
+    fontSize: 17,
     color: "#fff",
     fontWeight: "bold",
   },
@@ -91,6 +101,22 @@ const buttonRowStyles = StyleSheet.create({
 
 export function SettingsScreen({ navigation }: Props) {
   const { settings, setSettings } = useSettings();
+
+  const showStravaInfo = () => {
+    Alert.alert(
+      "Important Information",
+      "Due to Strava's duplicate detection, all activities directly uploaded to Strava after a split or combine have their start time offset by 30 seconds later. You can avoid this by exporting to a file instead.",
+      [{ text: "OK" }],
+    );
+  };
+
+  const showSplitsInfo = () => {
+    Alert.alert(
+      "Important Information",
+      "Multiple splits in one file are not supported yet. To do multiple splits, you have to load the activity again after splitting.",
+      [{ text: "OK" }],
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -138,6 +164,20 @@ export function SettingsScreen({ navigation }: Props) {
           { label: "Fahrenheit", value: TEMP_UNITS.F },
         ]}
       />
+      <ButtonSettingRow
+        label="Other Info"
+        onValueChange={(value) => {
+          if (value === "strava") {
+            showStravaInfo();
+          } else if (value === "splits") {
+            showSplitsInfo();
+          }
+        }}
+        items={[
+          { label: "Strava Uploads", value: "strava" },
+          { label: "Multiple Splits", value: "splits" },
+        ]}
+      />
     </ScrollView>
   );
 }
@@ -147,5 +187,20 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     backgroundColor: colors.dark,
+  },
+  infoButton: {
+    width: "50%",
+    margin: 5,
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: colors.accent,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  infoButtonText: {
+    fontSize: 15,
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
