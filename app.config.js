@@ -1,4 +1,4 @@
-const VERSION = "1.0.3";
+const VERSION = "1.0.4";
 // Must be less than 10
 const HOTFIX = 0;
 
