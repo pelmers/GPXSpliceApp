@@ -10,6 +10,7 @@ import { GpxFile, GpxPoint, calculateCumulativeDistance } from "../utils/gpx";
 import { EasyLineChart } from "./EasyLineChart";
 import { useSettings } from "../providers/SettingsProvider";
 import {
+  DISTANCE_UNITS,
   ELEVATION_UNITS,
   SPEED_UNITS,
   SavedSettings,
@@ -167,6 +168,10 @@ function computeXYValues(
         yValueAggregateSums.push(yValues[i] + lastYValueAggregateSum);
         break;
     }
+  }
+  // At the end also convert all x values to the correct distance unit from KM
+  for (let i = 0; i < xValues.length; i++) {
+    xValues[i] = convert(xValues[i], DISTANCE_UNITS.KM, settings).value;
   }
   return {
     xValues,
