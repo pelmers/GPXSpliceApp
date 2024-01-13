@@ -37,7 +37,7 @@ module.exports = () => ({
     },
     ios: {
       supportsTablet: true,
-      buildNumber: `${versionCode}${HOTFIX}`,
+      buildNumber: `${versionCode}`,
       bundleIdentifier: "com.pelmers.gpxsplice",
       infoPlist: {
         // allows us to link to Strava app for oauth

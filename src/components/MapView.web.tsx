@@ -80,14 +80,14 @@ type MarkerProps = {
   children: React.ReactNode;
 };
 
+let nextMarkerId = 0;
 export const Marker = (props: MarkerProps) => {
   const { coordinate, children, title } = props;
   const pointDataSource = useRef<GeoJSON.Feature<GeoJSON.Geometry> | null>(
     null,
   );
   const { map, isStyleLoaded } = useContext(MapContext);
-  // TODO: generate a globally unique id for this marker
-  const id = title;
+  const id = `marker-${nextMarkerId++}`;
 
   // TODO: this just adds the title as a text layer, but i want to use an icon actually
   useEffect(() => {

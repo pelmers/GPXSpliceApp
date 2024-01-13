@@ -18,6 +18,7 @@ ios
 *.key
 *.mobileprovision
 *.aab
+*.ipa
 
 # Metro
 .metro-health-check*
