@@ -1,6 +1,6 @@
 const VERSION = "1.0.4";
 // Must be less than 10
-const HOTFIX = 1;
+const HOTFIX = 2;
 
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
