@@ -35,7 +35,6 @@ export class MapView extends React.Component<MapViewProps> {
   componentDidMount() {
     // @ts-ignore token is set in webpack config from .env
     mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN;
-    console.log("mapboxgl.accessToken", mapboxgl.accessToken);
     const { initialRegion } = this.props;
     this.map = new mapboxgl.Map({
       container: this.mapContainer!,

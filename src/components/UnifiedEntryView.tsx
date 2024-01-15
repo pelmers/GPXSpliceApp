@@ -17,6 +17,7 @@ import { CLIENT_ID, REDIRECT_SERVER_URL, WEB_ORIGIN } from "../utils/client";
 import { StravaAthlete, getStravaAuthEndpoint } from "../types/strava";
 import { useStravaToken } from "../providers/StravaTokenProvider";
 import { Alert } from "react-native";
+import WebView from "react-native-webview";
 
 // On the web platform, oauth token is passed by window.postMessage from a
 // redirect page opened in a pop-up window, so this hook listens for that
@@ -81,6 +82,7 @@ export function UnifiedEntryScreen(props: Props) {
   const [authorizationEndpoint, setAuthorizationEndpoint] = useState<
     string | undefined
   >();
+  const [showWebView, setShowWebView] = useState(false);
 
   const { stravaToken, setStravaToken } = useStravaToken();
 
@@ -153,12 +155,26 @@ export function UnifiedEntryScreen(props: Props) {
     const handler = async (event: Linking.EventType) => {
       // See: https://github.com/expo/expo/issues/12044#issuecomment-889031264
       handleAuthResponse(parseUrlQuery(event.url));
+      setShowWebView(false);
     };
     const subscription = Linking.addEventListener("url", handler);
     return () => {
       subscription.remove();
     };
   }, []);
+
+  const params = new URLSearchParams({
+    client_id: CLIENT_ID,
+    redirect_uri: redirectUri.toString(),
+    response_type: "code",
+    scope: "activity:read_all,activity:write",
+  });
+
+  const authUrl = `${authorizationEndpoint!}?${params.toString()}`;
+
+  if (showWebView) {
+    return <WebView source={{ uri: authUrl }} />;
+  }
 
   return (
     <View style={styles.container}>
@@ -176,19 +192,15 @@ export function UnifiedEntryScreen(props: Props) {
             props.onAuthSuccess();
             return;
           }
-          const params = new URLSearchParams({
-            client_id: CLIENT_ID,
-            redirect_uri: redirectUri.toString(),
-            response_type: "code",
-            scope: "activity:read_all,activity:write",
-          });
-
-          const authUrl = `${authorizationEndpoint!}?${params.toString()}`;
-
           try {
             if (Platform.OS === "web") {
               window.open(authUrl, "_blank", "height=600,width=500");
+            } else if (Platform.OS === "ios" && !authUrl.startsWith("strava://")) {
+              // ios app store review tells us to use web view instead of system browser
+              setShowWebView(true);
             } else {
+              // android or ios with strava app available
+              // android implicit intent opens app if installed, otherwise browser
               await Linking.openURL(authUrl);
             }
           } catch (e) {
