@@ -61,6 +61,10 @@ class RedirectHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(error_message.encode('utf-8'))
 
+    def do_HEAD(self):
+        self.send_response(200)
+        self.end_headers()
+
     def do_GET(self):
         # Handle favicon first
         if self.path == '/favicon.ico':
