@@ -195,7 +195,10 @@ export function UnifiedEntryScreen(props: Props) {
           try {
             if (Platform.OS === "web") {
               window.open(authUrl, "_blank", "height=600,width=500");
-            } else if (Platform.OS === "ios" && !authUrl.startsWith("strava://")) {
+            } else if (
+              Platform.OS === "ios" &&
+              !authUrl.startsWith("strava://")
+            ) {
               // ios app store review tells us to use web view instead of system browser
               setShowWebView(true);
             } else {

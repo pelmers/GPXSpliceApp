@@ -6431,11 +6431,6 @@ human-signals@^2.1.0:
   resolved "https://registry.npmjs.org/human-signals/-/human-signals-2.1.0.tgz"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
 
-humanize-duration@^3.31.0:
-  version "3.31.0"
-  resolved "https://registry.npmjs.org/humanize-duration/-/humanize-duration-3.31.0.tgz"
-  integrity sha512-fRrehgBG26NNZysRlTq1S+HPtDpp3u+Jzdc/d5A4cEzOD86YLAkDaJyJg8krSdCi7CJ+s7ht3fwRj8Dl+Btd0w==
-
 hyphenate-style-name@^1.0.3:
   version "1.0.4"
   resolved "https://registry.npmjs.org/hyphenate-style-name/-/hyphenate-style-name-1.0.4.tgz"
@@ -8940,6 +8935,11 @@ react-native-gesture-handler@~2.12.0:
     invariant "^2.2.4"
     lodash "^4.17.21"
     prop-types "^15.7.2"
+
+react-native-localize@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/react-native-localize/-/react-native-localize-3.0.6.tgz#6df2e317038c0cafe051184b2f0280f89ef8050c"
+  integrity sha512-pfwwNKRfXcxp0LZEzj5oW2/uo5oZOhiQ4PYlg8uLlsl9pDLcWg03yLCHohTWKX02vE/BFz9hkrHT/nQtlO/iFg==
 
 react-native-maps@1.7.1:
   version "1.7.1"

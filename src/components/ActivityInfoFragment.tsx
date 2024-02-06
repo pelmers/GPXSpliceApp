@@ -1,6 +1,5 @@
-import { StyleSheet, View, Pressable, Text } from "react-native";
-
-import humanizeDuration from "humanize-duration";
+import { StyleSheet, View, Text } from "react-native";
+import * as RNLocalize from "react-native-localize";
 
 import { colors } from "../utils/colors";
 import { GpxSummary } from "../utils/gpx";
@@ -66,6 +65,15 @@ type Props = {
   textColor?: string;
 };
 
+function getLocale() {
+  try {
+    return RNLocalize.getLocales()[0].languageTag;
+  } catch (e) {
+    console.error("Error getting locale", e);
+    return "en-US";
+  }
+}
+
 export function ActivityInfoFragment(props: Props) {
   const { stats, name, location, activityType, isPrivate } = props;
   const color = props.textColor || colors.dark;
@@ -79,8 +87,12 @@ export function ActivityInfoFragment(props: Props) {
   const duration = stats.durationMs
     ? formatDuration(stats.durationMs / 1000)
     : null;
-  const timeSinceActivity = stats.startTime
-    ? Date.now() - Date.parse(stats.startTime)
+  const activityDateString = stats.startTime
+    ? new Date(stats.startTime).toLocaleDateString(getLocale(), {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
     : null;
   const publicText = isPrivate ? "🔒" : "🌎";
   return (
@@ -101,14 +113,8 @@ export function ActivityInfoFragment(props: Props) {
             </Text>
           )}
           {location && <Text style={extraTextStyle}>{location}</Text>}
-          {timeSinceActivity && (
-            <Text style={extraTextStyle}>
-              {humanizeDuration(timeSinceActivity, {
-                largest: 1,
-                round: true,
-              })}{" "}
-              ago
-            </Text>
+          {activityDateString && (
+            <Text style={extraTextStyle}>{activityDateString}</Text>
           )}
         </View>
       </View>
