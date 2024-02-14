@@ -35,7 +35,7 @@ _above:_ **Activity list and split map view**
 
 This app is written in React Native using the [Expo](https://expo.io/) framework.
 
-See **[my blog post](https://pelmers.com/TODO_LINK)** for a full technical writeup.
+See **[my blog post](https://pelmers.com/tour-of-react-native-2024/)** for a full technical writeup.
 
 - `yarn ios` to run in the iOS simulator
 - `yarn android` to run in the Android emulator
