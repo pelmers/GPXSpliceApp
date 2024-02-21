@@ -32,7 +32,7 @@ export function PostSplitScreen({ navigation, route }: Props) {
     async function splitGpxFile() {
       try {
         const fileContents = await FileSystem.readAsStringAsync(gpxFileUri);
-        const parsedGpx = parseGpxFile(fileContents);
+        const parsedGpx = parseGpxFile(gpxFileUri, fileContents);
         const file1 = {
           name: parsedGpx.name + " (1-2)",
           type: parsedGpx.type,

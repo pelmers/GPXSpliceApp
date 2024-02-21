@@ -90,7 +90,7 @@ export function pointsToGpx(gpx: GpxFile): string {
 }
 
 // Parses a gpx file as written by the above function into a list of points and its metadata
-export function parseGpxFile(gpxContents: string): {
+export function parseGpxFile(filepath: string, gpxContents: string): {
   points: GpxPoint[];
   name: string;
   type: string;
@@ -100,8 +100,8 @@ export function parseGpxFile(gpxContents: string): {
     ignoreAttributes: false,
   });
   const jsGpx = parser.parse(gpxContents).gpx;
-  const name = jsGpx.metadata.name;
-  const type = jsGpx.trk.type;
+  const name = jsGpx.metadata?.name ?? decodeURIComponent(filepath.split("/").pop() ?? "Unknown Name");
+  const type = jsGpx.trk.type ?? "Unknown Type";
   const trkpts = jsGpx.trk.trkseg.trkpt;
   const points = trkpts.map(
     (point: any): GpxPoint => ({

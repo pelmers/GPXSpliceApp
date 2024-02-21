@@ -23,7 +23,7 @@ export function CombinePreviewScreen({ navigation, route }: Props) {
       const parsedGpxs = await Promise.all(
         gpxFileUris.map(async (gpxFileUri) => {
           const fileContents = await FileSystem.readAsStringAsync(gpxFileUri);
-          return parseGpxFile(fileContents);
+          return parseGpxFile(gpxFileUri, fileContents);
         }),
       );
       parsedGpxs.sort((a, b) => {

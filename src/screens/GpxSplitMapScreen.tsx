@@ -25,7 +25,7 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
   useEffect(() => {
     async function readGpxFile() {
       const fileContents = await FileSystem.readAsStringAsync(gpxFileUri);
-      const parsedGpx = parseGpxFile(fileContents);
+      const parsedGpx = parseGpxFile(gpxFileUri, fileContents);
       setGpx(parsedGpx);
     }
     readGpxFile().catch((e) => {
