@@ -5,7 +5,7 @@
 <a href="https://apps.apple.com/app/gpxsplice/id6475313748"><img src="examples/ios-store-button.png" height="50"></a>
 <a href="https://play.google.com/store/apps/details?id=com.pelmers.gpxsplice"><img src="examples/android-store-button.png" height="50"></a>
 
-# GPX Splice
+# [GPX Splice](https://pelmers.com/announcing-gpx-splice/)
 
 </div>
 
@@ -50,6 +50,12 @@ All screens are contained in [src/screens](src/screens), and other UI components
 _Note:_
 If you want to develop the Strava integration, you will need to register an app on Strava settings and deploy `gpxsplice_redirect_server.py` somewhere.
 However you most likely don't need to touch this if you're just trying to make a fix or new feature.
+
+## Production Builds
+```
+eas build -p ios --profile production [--local]
+eas build -p android --profile production [--local]
+```
 
 ## Future work
 
