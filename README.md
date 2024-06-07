@@ -52,6 +52,7 @@ If you want to develop the Strava integration, you will need to register an app 
 However you most likely don't need to touch this if you're just trying to make a fix or new feature.
 
 ## Production Builds
+
 ```
 eas build -p ios --profile production [--local]
 eas build -p android --profile production [--local]

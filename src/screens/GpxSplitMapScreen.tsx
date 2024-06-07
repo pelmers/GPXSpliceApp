@@ -37,7 +37,11 @@ export function GpxSplitMapScreen({ navigation, route }: Props) {
     return (
       <View style={styles.container}>
         <Text style={styles.titleText}>Error!</Text>
-        <Text style={[styles.titleText, { color: "red" }]}>{error}</Text>
+        <Text
+          style={[styles.titleText, { color: "red", paddingHorizontal: 20 }]}
+        >
+          {error}
+        </Text>
       </View>
     );
   }

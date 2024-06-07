@@ -44,6 +44,7 @@ export function offsetAllTimes(gpx: GpxFile, offsetMs: number): GpxFile {
 
 // Converts a list of points into a gpx file
 export function pointsToGpx(gpx: GpxFile): string {
+  // TODO do I want to use multiple trkseg for pauses?
   const { points, name, type } = gpx;
   return `<?xml version="1.0" encoding="UTF-8"?>
 <gpx creator="GPXSplice with Barometer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd" version="1.1" xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3">
@@ -90,7 +91,10 @@ export function pointsToGpx(gpx: GpxFile): string {
 }
 
 // Parses a gpx file as written by the above function into a list of points and its metadata
-export function parseGpxFile(filepath: string, gpxContents: string): {
+export function parseGpxFile(
+  filepath: string,
+  gpxContents: string,
+): {
   points: GpxPoint[];
   name: string;
   type: string;
@@ -100,9 +104,19 @@ export function parseGpxFile(filepath: string, gpxContents: string): {
     ignoreAttributes: false,
   });
   const jsGpx = parser.parse(gpxContents).gpx;
-  const name = jsGpx.metadata?.name ?? decodeURIComponent(filepath.split("/").pop() ?? "Unknown Name");
+  const name =
+    jsGpx.metadata?.name ??
+    decodeURIComponent(filepath.split("/").pop() ?? "Unknown Name");
   const type = jsGpx.trk.type ?? "Unknown Type";
-  const trkpts = jsGpx.trk.trkseg.trkpt;
+  // trkseg can either be a single object or an array. if it's an array then join them all
+  const trkpts = Array.isArray(jsGpx.trk.trkseg)
+    ? jsGpx.trk.trkseg.flatMap((seg: any) => seg.trkpt || [])
+    : jsGpx.trk.trkseg.trkpt;
+  if (!trkpts) {
+    throw new Error(
+      "No track points found in gpx file. Check the file contents. If this is a bug in the app, please report it!",
+    );
+  }
   const points = trkpts.map(
     (point: any): GpxPoint => ({
       latlng: [parseFloat(point["@_lat"]), parseFloat(point["@_lon"])],

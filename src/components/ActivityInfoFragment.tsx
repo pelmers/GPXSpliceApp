@@ -40,7 +40,9 @@ function getActivityEmoji(activityType: string) {
   }
 }
 
-function formatDuration(duration: number) {
+function formatDuration(durationMs: number) {
+  // Get a whole number of milliseconds
+  const duration = Math.floor(durationMs);
   const hours = Math.floor(duration / 3600);
   const minutes = Math.floor((duration % 3600) / 60);
   const seconds = duration % 60;
