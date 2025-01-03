@@ -246,7 +246,7 @@ export function GpxChartingModule(props: Props) {
   const splitLabel =
     splitData != null
       ? `${yValues[splitData.index].toFixed(1)} ${yUnits}
-${xValues[splitData.index].toFixed(1)} ${xUnits}`
+${xValues[splitData.index].toFixed(2)} ${xUnits}`
       : null;
 
   const aggregateForInterval = (start: number, end: number) => {
