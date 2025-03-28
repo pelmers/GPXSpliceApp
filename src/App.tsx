@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Platform } from "react-native";
 
 import * as Font from "expo-font";
@@ -21,6 +21,7 @@ import { InfoScreen } from "./screens/InfoScreen";
 import { StravaTokenProvider } from "./providers/StravaTokenProvider";
 import PostAuthMessagePost from "./screens/PostAuthMessagePostScreen";
 import { WEB_ORIGIN } from "./utils/client";
+import Toast from 'react-native-toast-message';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -76,6 +77,7 @@ export default function App() {
             <Stack.Screen name="AuthRedirect" component={PostAuthMessagePost} />
           </Stack.Navigator>
         </NavigationContainer>
+        <Toast />
       </StravaTokenProvider>
     </SettingsProvider>
   );

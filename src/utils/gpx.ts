@@ -1,5 +1,5 @@
 import { point as turfPoint, distance as turfDistance } from "@turf/turf";
-
+import Toast from 'react-native-toast-message';
 import { XMLParser } from "fast-xml-parser";
 
 export type GpxPoint = { latlng: [number, number] } & Partial<{
@@ -107,11 +107,20 @@ export function parseGpxFile(
   const name =
     jsGpx.metadata?.name ??
     decodeURIComponent(filepath.split("/").pop() ?? "Unknown Name");
-  const type = jsGpx.trk.type ?? "Unknown Type";
+  // if trk is an array, take the first one and toast the user that we are ignoring some
+  const trk = Array.isArray(jsGpx.trk) ? jsGpx.trk[0] : jsGpx.trk;
+  if (Array.isArray(jsGpx.trk)) {
+    Toast.show({
+      text1: "Multiple tracks found in gpx file",
+      text2: "Only the first one will be used",
+      type: "info",
+    });
+  }
+  const type = trk.type ?? "Unknown Type";
   // trkseg can either be a single object or an array. if it's an array then join them all
-  const trkpts = Array.isArray(jsGpx.trk.trkseg)
-    ? jsGpx.trk.trkseg.flatMap((seg: any) => seg.trkpt || [])
-    : jsGpx.trk.trkseg.trkpt;
+  const trkpts = Array.isArray(trk.trkseg)
+    ? trk.trkseg.flatMap((seg: any) => seg.trkpt || [])
+    : trk.trkseg.trkpt;
   if (!trkpts) {
     throw new Error(
       "No track points found in gpx file. Check the file contents. If this is a bug in the app, please report it!",
