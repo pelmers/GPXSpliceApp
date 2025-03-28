@@ -1,6 +1,6 @@
 const VERSION = "1.0.9";
 // Must be less than 10
-const HOTFIX = 0;
+const HOTFIX = 1;
 
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
@@ -66,6 +66,9 @@ module.exports = () => ({
             targetSdkVersion: 34,
             buildToolsVersion: "34.0.0",
           },
+          ios: {
+            deploymentTarget: "18.0"
+          }
         },
       ],
     ],
