@@ -7,7 +7,7 @@ import {
   TouchableHighlight,
 } from "react-native";
 
-import { ResizeMode, Video } from "expo-av";
+import { VideoView, useVideoPlayer } from "expo-video";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 import { colors } from "../utils/colors";
@@ -18,23 +18,17 @@ import { BlurView } from "expo-blur";
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export function HomeScreen({ navigation }: Props) {
+  const player = useVideoPlayer(require("../../assets/banner.mp4"), player => {
+    player.loop = true;
+    player.play();
+  });
+
   return (
     <View style={styles.container}>
-      <Video
-        source={require("../../assets/banner.mp4")}
+      <VideoView
+        player={player}
         style={styles.bannerVideo}
-        rate={1.0}
-        volume={1.0}
-        isMuted={true}
-        resizeMode={ResizeMode.COVER}
-        onReadyForDisplay={(videoData) => {
-          if (Platform.OS === "web") {
-            // @ts-ignore see https://stackoverflow.com/a/74660089/2288934
-            videoData.srcElement.style.position = "initial";
-          }
-        }}
-        shouldPlay
-        isLooping
+        contentFit="cover"
       />
       {/* expo blur doesn't work with transitions on android: https://github.com/expo/expo/issues/3523#issuecomment-472146615 */}
       {Platform.OS === "ios" && (

@@ -5429,11 +5429,6 @@ expo-auth-session@~6.0.3:
     expo-web-browser "~14.0.2"
     invariant "^2.2.4"
 
-expo-av@~15.0.2:
-  version "15.0.2"
-  resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-15.0.2.tgz#65bb08658a7fe3a67aa47da614abbfae9adb684e"
-  integrity sha512-AHIHXdqLgK1dfHZF0JzX3YSVySGMrWn9QtPzaVjw54FAzvXfMt4sIoq4qRL/9XWCP9+ICcCs/u3EcvmxQjrfcA==
-
 expo-blur@~14.0.3:
   version "14.0.3"
   resolved "https://registry.yarnpkg.com/expo-blur/-/expo-blur-14.0.3.tgz#656d6b2442bfbbfb2a6608c6bc1151b29bce6698"

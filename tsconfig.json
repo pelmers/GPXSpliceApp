@@ -3,6 +3,6 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": ".",
-    "moduleSuffixes": [".web", ".native", ""]
+    "moduleSuffixes": [".native", "", ".web"]
   }
 }
