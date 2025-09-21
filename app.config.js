@@ -1,6 +1,6 @@
-const VERSION = "1.0.9";
+const VERSION = "1.0.10";
 // Must be less than 10
-const HOTFIX = 1;
+const HOTFIX = 0;
 
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
@@ -42,6 +42,7 @@ module.exports = () => ({
       infoPlist: {
         // allows us to link to Strava app for oauth
         LSApplicationQueriesSchemes: ["strava"],
+        ITSAppUsesNonExemptEncryption: false,
       },
     },
     android: {
