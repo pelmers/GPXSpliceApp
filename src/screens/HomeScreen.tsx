@@ -18,10 +18,13 @@ import { BlurView } from "expo-blur";
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export function HomeScreen({ navigation }: Props) {
-  const player = useVideoPlayer(require("../../assets/banner.mp4"), player => {
-    player.loop = true;
-    player.play();
-  });
+  const player = useVideoPlayer(
+    require("../../assets/banner.mp4"),
+    (player) => {
+      player.loop = true;
+      player.play();
+    },
+  );
 
   return (
     <View style={styles.container}>

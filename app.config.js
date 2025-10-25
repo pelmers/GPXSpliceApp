@@ -68,8 +68,8 @@ module.exports = () => ({
             buildToolsVersion: "34.0.0",
           },
           ios: {
-            deploymentTarget: "18.0"
-          }
+            deploymentTarget: "18.0",
+          },
         },
       ],
     ],

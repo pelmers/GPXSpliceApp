@@ -111,13 +111,13 @@ function computeXYValues(
   if (!enabledForType(chartType, points)) {
     // chart isn't enabled but we don't want to actually throw an error at the user and crash the UI
     // so sub in 0s by default. this can happen if elevation data is missing since that's the default state on the graph
-    const zeroValueArray = new Array(xValues.length).fill(0)
+    const zeroValueArray = new Array(xValues.length).fill(0);
     return {
       xValues,
       yValues: zeroValueArray,
       yValueAggregateSums: zeroValueArray,
       yValueAggregateType,
-    }
+    };
   }
   const yValues: number[] = [];
   // yValueAggregaetes contains a list to allow efficient calculation of the aggregate at any split point
@@ -191,7 +191,7 @@ function computeXYValues(
 
 function ChartButtonRow(props: {
   currentType: ChartType;
-  enabledTypes: ChartType[],
+  enabledTypes: ChartType[];
   gpxFile: GpxFile;
   onPress: (chartType: ChartType) => void;
 }) {
@@ -235,10 +235,12 @@ function computeSplitPercent(
 export function GpxChartingModule(props: Props) {
   const { gpxFile, splitData, chartHeight, chartWidth } = props;
   const enabledChartTypes = useMemo(
-    () => ChartTypesArray.filter(tp => enabledForType(tp, gpxFile.points)),
-    [gpxFile]
+    () => ChartTypesArray.filter((tp) => enabledForType(tp, gpxFile.points)),
+    [gpxFile],
   );
-  const [chartType, setChartType] = useState<ChartType>(enabledChartTypes[0] || "elevation");
+  const [chartType, setChartType] = useState<ChartType>(
+    enabledChartTypes[0] || "elevation",
+  );
   const { settings } = useSettings();
   const { xValues, yValues, yValueAggregateSums, yValueAggregateType } =
     useMemo(

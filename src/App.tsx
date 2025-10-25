@@ -21,7 +21,7 @@ import { InfoScreen } from "./screens/InfoScreen";
 import { StravaTokenProvider } from "./providers/StravaTokenProvider";
 import PostAuthMessagePost from "./screens/PostAuthMessagePostScreen";
 import { WEB_ORIGIN } from "./utils/client";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

@@ -1,5 +1,5 @@
 import { point as turfPoint, distance as turfDistance } from "@turf/turf";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 import { XMLParser } from "fast-xml-parser";
 
 export type GpxPoint = { latlng: [number, number] } & Partial<{
