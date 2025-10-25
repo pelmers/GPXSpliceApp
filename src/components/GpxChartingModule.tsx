@@ -223,16 +223,13 @@ function ChartButtonRow(props: {
   );
 }
 
-// The split slider units are indices, but the chart is in distance on the x axis.
-// So we want to get the distance of the split point, and then find the index of the point closest to that distance
-// Return the proportion of the total distance that the split point is at
+// The split slider units are indices, and the chart x axis is also scaled by indices.
+// Even though the chart displays distance units, it's actually not linear in distance but rather time.
 function computeSplitPercent(
   cumulativeDistances: number[],
   splitIndex: number,
 ) {
-  const totalDistance = cumulativeDistances[cumulativeDistances.length - 1];
-  const splitDistance = cumulativeDistances[splitIndex];
-  return splitDistance / totalDistance;
+  return splitIndex / (cumulativeDistances.length - 1);
 }
 
 export function GpxChartingModule(props: Props) {
