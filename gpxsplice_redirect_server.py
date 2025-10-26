@@ -2,13 +2,13 @@
 # Super simple python server with 1 job: redirect all requests to the "gpxsplice://" schema
 
 import argparse
-import http.client
 import json
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 import urllib.request
 import logging
+import urllib.parse
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,10 +20,12 @@ logging.basicConfig(
 import os
 CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
+THIS_DOMAIN = os.environ['THIS_DOMAIN']
+ANALYTICS_API_KEY = os.environ['RYBBIT_API_KEY']
+ANALYTICS_SITE_ID = "3"
 
 STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token'
-ANALYTICS_SERVER = 'plausible.pelmers.com'
-THIS_DOMAIN = 'gpxspliceredirect.pelmers.com'
+ANALYTICS_TRACK_URL = 'https://rubber.pelmers.com/api/track'
 
 FAVICON = None
 try:
@@ -34,24 +36,32 @@ except FileNotFoundError:
 
 
 def send_analytics_event(path, user_agent, ip_address):
-    conn = http.client.HTTPSConnection(ANALYTICS_SERVER)
-    headers = {
-        'User-Agent': user_agent,
-        'X-Forwarded-For': ip_address,
-        'Content-Type': 'application/json',
+    payload = {
+        'api_key': ANALYTICS_API_KEY,
+        'site_id': ANALYTICS_SITE_ID,
+        'type': 'pageview',
+        'pathname': path,
+        'hostname': THIS_DOMAIN,
+        'page_title': 'GPX Splice Redirect',
+        'user_agent': user_agent or '',
+        'ip_address': ip_address or '',
     }
-    data = {
-        'name': 'pageview',
-        'url': f'https://{THIS_DOMAIN}{path}',
-        'domain': THIS_DOMAIN,
-    }
-    conn.request("POST", "/api/event", body=json.dumps(data), headers=headers)
-    response = conn.getresponse()
-    if response.status != 200 and response.status != 202:
-        logging.error(f"Error sending analytics event: {response.status} {response.reason}")
-    else:
-        logging.info(f"Sent analytics event for ip {ip_address} user agent {user_agent}")
-    conn.close()
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        ANALYTICS_TRACK_URL,
+        data=data,
+        headers={'Content-Type': 'application/json'},
+        method='POST'
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status not in (200, 202):
+                body = resp.read().decode('utf-8', errors='ignore')
+                logging.error(f"Analytics error: {resp.status} {resp.reason} {body}")
+            else:
+                logging.info("Analytics event sent")
+    except Exception as e:
+        logging.error(f"Failed to send analytics event: {e}")
 
 
 class RedirectHandler(BaseHTTPRequestHandler):
@@ -140,6 +150,6 @@ if __name__ == '__main__':
     parser.add_argument('--port', type=int, default=8000)
     args = parser.parse_args()
 
-    server = HTTPServer(('localhost', args.port), RedirectHandler)
+    server = HTTPServer(('0.0.0.0', args.port), RedirectHandler)
     logging.info(f"Listening on port {args.port}...")
     server.serve_forever()
