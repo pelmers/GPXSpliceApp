@@ -252,7 +252,12 @@ def revoke_token(record):
             raise RuntimeError(f"Unexpected revoke status {response.status}")
 
 
-def cleanup_token_ledger(max_age_days, credential='shared', dry_run=False):
+def cleanup_token_ledger(
+    max_age_days,
+    credential='shared',
+    dry_run=False,
+    include_blipper=False
+):
     ledger = load_token_ledger()
     cutoff = utc_now() - datetime.timedelta(days=max_age_days)
     revoked = 0
@@ -262,6 +267,8 @@ def cleanup_token_ledger(max_age_days, credential='shared', dry_run=False):
         if credential != 'all' and record.get('credential') != credential:
             continue
         if not record.get('refresh_token') and not record.get('access_token'):
+            continue
+        if record.get('app') == 'blipper' and not include_blipper:
             continue
         authorized_at = parse_timestamp(record.get('last_authorized_at'))
         if not authorized_at or authorized_at > cutoff:
@@ -406,12 +413,22 @@ if __name__ == '__main__':
         default='shared'
     )
     cleanup_parser.add_argument('--dry-run', action='store_true')
+    cleanup_parser.add_argument(
+        '--include-blipper',
+        action='store_true',
+        help='Also revoke Blipper athletes; by default Blipper is excluded.'
+    )
 
     parser.add_argument('--port', type=int, default=8000)
     args = parser.parse_args()
 
     if args.command == 'cleanup':
-        cleanup_token_ledger(args.max_age_days, args.credential, args.dry_run)
+        cleanup_token_ledger(
+            args.max_age_days,
+            args.credential,
+            args.dry_run,
+            args.include_blipper
+        )
         raise SystemExit(0)
 
     port = args.port if args.command is None else args.port
