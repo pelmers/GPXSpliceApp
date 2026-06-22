@@ -20,6 +20,8 @@ logging.basicConfig(
 import os
 CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
+SHARED_CLIENT_ID = os.environ.get('SHARED_CLIENT_ID')
+SHARED_CLIENT_SECRET = os.environ.get('SHARED_CLIENT_SECRET')
 THIS_DOMAIN = os.environ['THIS_DOMAIN']
 ANALYTICS_API_KEY = os.environ['RYBBIT_API_KEY']
 ANALYTICS_SITE_ID = "3"
@@ -64,6 +66,36 @@ def send_analytics_event(path, user_agent, ip_address):
         logging.error(f"Failed to send analytics event: {e}")
 
 
+def append_query(url, values):
+    separator = '&' if '?' in url else '?'
+    return url + separator + urllib.parse.urlencode(values)
+
+
+def strava_credentials_for_path(path):
+    shared_prefix = '/shared/client_uri/'
+    legacy_prefix = '/client_uri/'
+
+    if path.startswith(shared_prefix):
+        if not SHARED_CLIENT_ID or not SHARED_CLIENT_SECRET:
+            raise RuntimeError('Shared Strava client is not configured')
+        return (
+            'shared',
+            SHARED_CLIENT_ID,
+            SHARED_CLIENT_SECRET,
+            urllib.parse.unquote(path[len(shared_prefix):])
+        )
+
+    if path.startswith(legacy_prefix):
+        return (
+            'legacy',
+            CLIENT_ID,
+            CLIENT_SECRET,
+            urllib.parse.unquote(path[len(legacy_prefix):])
+        )
+
+    return None
+
+
 class RedirectHandler(BaseHTTPRequestHandler):
     def handle_error(self, error_message):
         logging.error(f"Error: {error_message}")
@@ -90,30 +122,39 @@ class RedirectHandler(BaseHTTPRequestHandler):
         # Parse the URL and parameters
         parsed_url = urlparse(self.path)
         params = parse_qs(parsed_url.query)
-        if not self.path.startswith('/client_uri'):
+        try:
+            route = strava_credentials_for_path(parsed_url.path)
+        except RuntimeError as e:
+            self.handle_error(str(e))
+            return
+        if route is None:
             logging.error(f"Missing client_uri in request: {self.path}")
             self.send_response(400)
             self.end_headers()
             return
 
-        # Decode everything after the /client_uri/ as the client uri
-        client_uri = urllib.parse.unquote(parsed_url.path.split('/')[2])
+        credential_name, client_id, client_secret, client_uri = route
+        if not client_uri:
+            logging.error(f"Missing client URI in request: {self.path}")
+            self.send_response(400)
+            self.end_headers()
+            return
 
         # Perform key exchange with the Strava API by sending the code with client id and secret
         if 'code' not in params:
             logging.error(f"Missing code in request: {self.path}")
             # Redirect back to client with error
-            client_uri += '?' + urllib.parse.urlencode({'error': 'Missing code in request'})
+            client_uri = append_query(client_uri, {'error': 'Missing code in request'})
             self.send_response(302)
             self.send_header('Location', client_uri)
             self.end_headers()
             return
 
         code = params['code'][0]
-        logging.info(f"Exchanging code {code} for access token...")
+        logging.info(f"Exchanging Strava code using {credential_name} client...")
         data = urllib.parse.urlencode({
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET,
+            'client_id': client_id,
+            'client_secret': client_secret,
             'code': code,
             'grant_type': 'authorization_code'
         }).encode('ascii')
@@ -132,7 +173,7 @@ class RedirectHandler(BaseHTTPRequestHandler):
 
         logging.info(f"Redirecting to {client_uri}")
         # Encode the result in the redirect URL parameters
-        client_uri += '?' + urllib.parse.urlencode({'payload': res})
+        client_uri = append_query(client_uri, {'payload': res})
         # And encode the original URL parameters as well
         client_uri += '&' + parsed_url.query
         # Send a 302 redirect response
