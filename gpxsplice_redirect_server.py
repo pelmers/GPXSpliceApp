@@ -79,6 +79,28 @@ def append_query(url, values):
     return url + separator + urllib.parse.urlencode(values)
 
 
+def append_fragment(url, values):
+    base, _, _fragment = url.partition('#')
+    return base + '#' + urllib.parse.urlencode(values)
+
+
+def should_use_fragment_callback(client_uri):
+    parsed = urlparse(client_uri)
+    return (
+        parsed.scheme in ('http', 'https') and
+        parsed.netloc in ('streetwarp.com', 'www.streetwarp.com')
+    )
+
+
+def append_client_callback_payload(client_uri, values, original_query=''):
+    if should_use_fragment_callback(client_uri):
+        return append_fragment(client_uri, values)
+    client_uri = append_query(client_uri, values)
+    if original_query:
+        client_uri += '&' + original_query
+    return client_uri
+
+
 def strava_credentials_for_path(path):
     shared_prefix = '/shared/client_uri/'
     legacy_prefix = '/client_uri/'
@@ -345,7 +367,10 @@ class RedirectHandler(BaseHTTPRequestHandler):
         if 'code' not in params:
             logging.error(f"Missing code in request: {self.path}")
             # Redirect back to client with error
-            client_uri = append_query(client_uri, {'error': 'Missing code in request'})
+            client_uri = append_client_callback_payload(
+                client_uri,
+                {'error': 'Missing code in request'}
+            )
             self.send_response(302)
             self.send_header('Location', client_uri)
             self.end_headers()
@@ -386,9 +411,11 @@ class RedirectHandler(BaseHTTPRequestHandler):
 
         logging.info(f"Redirecting to {client_uri}")
         # Encode the result in the redirect URL parameters
-        client_uri = append_query(client_uri, {'payload': res})
-        # And encode the original URL parameters as well
-        client_uri += '&' + parsed_url.query
+        client_uri = append_client_callback_payload(
+            client_uri,
+            {'payload': res},
+            parsed_url.query
+        )
         # Send a 302 redirect response
         self.send_response(302)
         self.send_header('Location', client_uri)
