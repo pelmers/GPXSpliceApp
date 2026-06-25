@@ -202,6 +202,7 @@ def remember_token(credential_name, client_id, client_uri, scope, token_payload)
             if part
         ),
         'app': client_label(client_uri),
+        'client_uri': client_uri,
         'scope': scope,
         'access_token': access_token,
         'refresh_token': refresh_token,
@@ -211,7 +212,7 @@ def remember_token(credential_name, client_id, client_uri, scope, token_payload)
     }
     save_token_ledger(ledger)
     logging.info(
-        f"Remembered Strava token for {credential_name} athlete_id={athlete_id} app={client_label(client_uri)}"
+        f"Remembered Strava token for {credential_name} athlete_id={athlete_id} app={client_label(client_uri)} client_uri={client_uri}"
     )
 
 
